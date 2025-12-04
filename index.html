@@ -10,11 +10,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="日本旅遊">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#1c1917">
+    <meta name="theme-color" content="#f4f4f0">
     <link rel="apple-touch-icon" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/sprites/solid.svg"> 
     
     <!-- Android Manifest -->
-    <link rel="manifest" href='data:application/manifest+json,%7B%22name%22%3A%22%E6%97%A5%E6%9C%AC%E6%97%85%E9%81%8A%E5%B0%8F%E5%B9%AB%E6%89%8B%22%2C%22short_name%22%3A%22%E6%97%A5%E6%9C%AC%E6%97%85%E9%81%8A%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%231c1917%22%2C%22theme_color%22%3A%22%231c1917%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F827%2F827056.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D'>
+    <link rel="manifest" href='data:application/manifest+json,%7B%22name%22%3A%22%E6%97%A5%E6%9C%AC%E6%97%85%E9%81%8A%E5%B0%8F%E5%B9%AB%E6%89%8B%22%2C%22short_name%22%3A%22%E6%97%A5%E6%9C%AC%E6%97%85%E9%81%8A%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f4f4f0%22%2C%22theme_color%22%3A%22%23f4f4f0%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F827%2F827056.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D'>
 
     <!-- Fonts & CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -58,6 +58,7 @@
         .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(40, 40, 40, 0.9); color: white; padding: 10px 20px; border-radius: 50px; font-size: 13px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 3000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .toast.active { opacity: 1; transform: translateX(-50%) translateY(0); }
         html.dark .toast { background: rgba(255, 255, 255, 0.9); color: #1c1917; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
 <body>
@@ -167,7 +168,7 @@
             <!-- 5. INFO -->
             <div id="tab-info" class="tab-content">
                 <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6 transition-colors duration-300 border-l-4 border-l-amber-400">
-                    <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3 uppercase border-b border-stone-100 dark:border-stone-700 pb-2 flex justify-between items-center"><span><i class="fa-solid fa-cloud mr-2"></i>旅程同步設定</span><span id="sync-status" class="text-[10px] text-stone-400 font-normal bg-stone-100 dark:bg-stone-700 px-2 py-0.5 rounded-full">未連線</span></h3>
+                    <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3 uppercase border-b border-stone-100 dark:border-stone-700 pb-2 flex justify-between items-center"><span><i class="fa-solid fa-cloud mr-2"></i>旅程同步設定</span><span id="sync-status" class="text-[10px] text-stone-400 font-normal bg-stone-100 dark:bg-stone-700 px-2 py-0.5 rounded-full">檢查中...</span></h3>
                     <div class="space-y-4">
                         <p class="text-[10px] text-stone-400 dark:text-stone-500 leading-relaxed"><i class="fa-solid fa-circle-info mr-1"></i>注意：僅同步「行程、導覽、航班、標題日期」。<br>「記帳、清單、備忘錄」為個人資料，僅儲存於此裝置。</p>
                         <div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">旅程代碼 (分享給親友)</label><div class="flex gap-2"><div id="current-trip-id" class="flex-1 bg-stone-100 dark:bg-stone-900 dark:text-white rounded-lg p-3 text-center font-mono font-bold text-lg tracking-wider select-all">...</div><button onclick="copyTripId()" class="bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 px-4 rounded-lg"><i class="fa-regular fa-copy"></i></button></div></div><div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">加入其他旅程</label><div class="flex gap-2"><input type="text" id="join-trip-input" placeholder="輸入代碼" class="flex-1 bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2 uppercase"><button onclick="joinTrip()" class="bg-stone-700 dark:bg-stone-600 text-white px-4 rounded-lg text-sm font-bold">連線</button></div></div>
@@ -180,7 +181,7 @@
             </div>
         </main>
 
-        <!-- Navigation & Modals (Unchanged for brevity, same as previous) -->
+        <!-- Navigation -->
         <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 px-2 py-2 flex justify-around items-end z-50 text-[10px] font-medium text-stone-400 pb-safe transition-colors duration-300">
             <button onclick="switchTab('plan')" class="nav-btn active flex flex-col items-center gap-1 p-2 w-1/5 text-muji-primary dark:text-stone-500" data-target="plan"><i class="fa-regular fa-calendar-days text-lg mb-0.5"></i><span>行程</span></button>
             <button onclick="switchTab('guide')" class="nav-btn flex flex-col items-center gap-1 p-2 w-1/5 hover:text-stone-600" data-target="guide"><i class="fa-solid fa-book-open text-lg mb-0.5"></i><span>導覽</span></button>
@@ -189,6 +190,7 @@
             <button onclick="switchTab('info')" class="nav-btn flex flex-col items-center gap-1 p-2 w-1/5 hover:text-stone-600" data-target="info"><i class="fa-solid fa-circle-info text-lg mb-0.5"></i><span>資訊</span></button>
         </nav>
 
+        <!-- Modals -->
         <div id="confirm-modal" class="modal-overlay"><div class="modal-box"><h3 class="font-bold text-lg mb-2 dark:text-white">確認</h3><p id="confirm-message" class="text-sm text-gray-500 mb-6 dark:text-gray-400"></p><div class="flex justify-end gap-3"><button onclick="closeModal('confirm-modal')" class="px-4 py-2 text-sm text-gray-500">取消</button><button id="confirm-btn" class="px-4 py-2 text-sm bg-stone-700 text-white rounded">確定</button></div></div></div>
         <div id="edit-day-modal" class="modal-overlay"><div class="modal-box"><h3 class="font-bold text-lg mb-4 dark:text-white">編輯標題</h3><div class="space-y-4 mb-6"><input type="text" id="edit-day-date" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded"><input type="text" id="edit-day-title" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded"></div><div class="flex justify-end gap-3"><button onclick="closeModal('edit-day-modal')" class="text-sm text-gray-500">取消</button><button id="save-day-btn" class="text-sm bg-stone-700 text-white px-4 py-2 rounded">儲存</button></div></div></div>
         <div id="edit-flight-modal" class="modal-overlay"><div class="modal-box"><h3 class="font-bold text-lg mb-4 dark:text-white">編輯航班</h3><div class="space-y-3 mb-6"><div class="flex gap-2"><input type="text" id="edit-dep-airport" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"><input type="time" id="edit-dep-time" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div><div class="flex gap-2"><input type="text" id="edit-arr-airport" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"><input type="time" id="edit-arr-time" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div><input type="text" id="edit-flight-num" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div><div class="flex justify-end gap-3"><button onclick="closeModal('edit-flight-modal')" class="text-sm text-gray-500">取消</button><button onclick="saveFlightInfo()" class="text-sm bg-stone-700 text-white px-4 py-2 rounded">儲存</button></div></div></div>
@@ -201,42 +203,68 @@
         import { getFirestore, doc, onSnapshot, setDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'japan-trip-helper';
+        // --- ROBUST FIREBASE INIT ---
+        let app, auth, db, appId, firebaseConfig;
+        let isOfflineOnly = false;
         let currentUser = null;
         let currentTripId = localStorage.getItem('currentTripId') || 'TRIP-' + Math.floor(1000 + Math.random() * 9000);
         let unsubscribeSnapshot = null;
 
+        try {
+            if (typeof __firebase_config !== 'undefined') {
+                firebaseConfig = JSON.parse(__firebase_config);
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'japan-trip-helper';
+            } else {
+                throw new Error("Local file detected");
+            }
+        } catch (e) {
+            console.warn("Firebase config missing or local file. Running in OFFLINE MODE.");
+            isOfflineOnly = true;
+            document.getElementById('sync-status').innerText = "離線模式";
+        }
+
+        // --- DATA MODELS ---
         let sharedData = {
             tripData: [{ day: "第一天", date: "請點擊編輯日期", title: "點擊編輯標題", events: [] }],
             guideData: [],
             flightData: { depAirport: "TPE", depTime: "02:30", arrAirport: "NRT", arrTime: "06:35", flightNum: "捷星 GK12" },
             appSettings: { title: "東京旅遊", date: "2026.01.11 - 01.18" }
         };
-
-        let localData = {
-            checklist: [{ text: "護照 (Passport)", checked: false }, { text: "日幣現金", checked: false }, { text: "信用卡 (海外回饋高)", checked: false }, { text: "Visit Japan Web 填寫", checked: false }, { text: "Sim卡 / 漫遊開通", checked: false }, { text: "行動電源", checked: false }, { text: "個人常備藥品", checked: false }, { text: "雨具 (摺疊傘)", checked: false }, { text: "環保購物袋", checked: false }],
-            expenses: [],
-            memo: ""
-        };
-
+        let localData = { checklist: [], expenses: [], memo: "" };
+        
+        const storedShared = localStorage.getItem('sharedDataBackup');
+        if(storedShared) sharedData = JSON.parse(storedShared);
+        
         const storedLocal = localStorage.getItem('localUserData');
         if (storedLocal) { localData = JSON.parse(storedLocal); }
+        else {
+             localData.checklist = [{ text: "護照", checked: false }, { text: "日幣", checked: false }, { text: "信用卡", checked: false }, { text: "網卡", checked: false }];
+        }
 
         const knownLocations = { "淺草寺": { desc: "東京都內最古老的寺廟...", tip: "求籤如果是「凶」，請將籤詩綁在架子上化解。" }, "雷門": { desc: "淺草寺的表參道入口...", tip: "燈籠底部有龍的雕刻。" } };
 
+        // --- AUTH & SYNC ---
         const initAuth = async () => {
+            if (isOfflineOnly) return;
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } 
                 else { await signInAnonymously(auth); }
-            } catch (error) { console.error("Auth Error", error); }
+            } catch (error) { 
+                console.error("Auth Error", error); 
+                isOfflineOnly = true; 
+                document.getElementById('sync-status').innerText = "離線模式";
+            }
         };
-        onAuthStateChanged(auth, (user) => { if (user) { currentUser = user; initSync(); } });
+        
+        if (!isOfflineOnly && auth) {
+            onAuthStateChanged(auth, (user) => { if (user) { currentUser = user; initSync(); } });
+        }
 
         function initSync() {
+            if (isOfflineOnly) return;
             document.getElementById('current-trip-id').innerText = currentTripId;
             localStorage.setItem('currentTripId', currentTripId);
             if (unsubscribeSnapshot) unsubscribeSnapshot();
@@ -249,27 +277,37 @@
                     if(remoteData.guideData) sharedData.guideData = remoteData.guideData;
                     if(remoteData.flightData) sharedData.flightData = remoteData.flightData;
                     if(remoteData.appSettings) sharedData.appSettings = remoteData.appSettings;
+                    localStorage.setItem('sharedDataBackup', JSON.stringify(sharedData));
                     renderSharedUI();
                     statusEl.innerText = "已同步"; statusEl.className = "text-[10px] text-green-600 font-bold bg-green-100 px-2 py-0.5 rounded-full";
                 } else {
                     saveShared(); statusEl.innerText = "新旅程";
                 }
-            }, (error) => { console.error("Sync Error:", error); document.getElementById('sync-status').innerText = "離線模式"; });
+            }, (error) => { console.error("Sync Error:", error); isOfflineOnly = true; document.getElementById('sync-status').innerText = "離線模式 (權限不足)"; });
         }
 
         function saveLocal() { localStorage.setItem('localUserData', JSON.stringify(localData)); }
         async function saveShared() {
-            if (!currentUser) return;
+            localStorage.setItem('sharedDataBackup', JSON.stringify(sharedData));
+            if (isOfflineOnly || !currentUser) return;
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'trips', currentTripId);
-            try { await setDoc(docRef, sharedData); document.getElementById('sync-status').innerText = "儲存中..."; setTimeout(() => document.getElementById('sync-status').innerText = "已同步", 500); } catch (e) {}
+            try { await setDoc(docRef, sharedData); document.getElementById('sync-status').innerText = "儲存中..."; setTimeout(() => document.getElementById('sync-status').innerText = "已同步", 500); } 
+            catch (e) { console.error("Save Error", e); if(e.code === 'permission-denied') { isOfflineOnly = true; document.getElementById('sync-status').innerText = "離線模式 (儲存失敗)"; } }
         }
 
-        // Global Exports
+        // --- EXPORTS ---
         window.copyTripId = () => { navigator.clipboard.writeText(currentTripId).then(() => showToast("代碼已複製")); };
-        window.joinTrip = () => { const input = document.getElementById('join-trip-input'); const newId = input.value.trim().toUpperCase(); if (!newId) { showToast("請輸入代碼"); return; } if (confirm(`切換到 [${newId}]？`)) { currentTripId = newId; initSync(); showToast(`已切換`); input.value = ''; } };
+        window.joinTrip = () => {
+            if(isOfflineOnly) { showToast("離線模式無法加入旅程"); return; }
+            const input = document.getElementById('join-trip-input');
+            const newId = input.value.trim().toUpperCase();
+            if (!newId) return;
+            if (confirm(`切換到 [${newId}]？`)) { currentTripId = newId; initSync(); showToast(`已切換`); input.value = ''; }
+        };
         window.togglePlanForm = () => document.getElementById('add-plan-form').classList.toggle('hidden');
         window.toggleGuideForm = () => document.getElementById('add-guide-form').classList.toggle('hidden');
         window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+        
         window.addPlanEvent = () => {
             const dayIndex = document.getElementById('plan-day-select').value;
             const time = document.getElementById('plan-time').value;
@@ -279,23 +317,27 @@
             const important = document.getElementById('plan-important').checked;
             if (!time || !text) { showToast('請輸入內容'); return; }
             sharedData.tripData[dayIndex].events.push({ id: Date.now() + Math.random(), time, text, type, link, important });
-            saveShared(); document.getElementById('plan-text').value = ''; document.getElementById('plan-link').value = ''; window.togglePlanForm(); showToast('已新增');
+            saveShared();
+            document.getElementById('plan-text').value = ''; document.getElementById('plan-link').value = ''; window.togglePlanForm(); showToast('已新增');
+            renderPlan(); 
         };
-        window.deletePlanEvent = (dIdx, eId) => { showConfirm('刪除？', () => { sharedData.tripData[dIdx].events = sharedData.tripData[dIdx].events.filter(e => String(e.id) !== String(eId)); saveShared(); }); };
-        window.addNewDay = () => { sharedData.tripData.push({ day: `第${sharedData.tripData.length+1}天`, date: "日期", title: "點擊編輯", events: [] }); saveShared(); };
-        window.deleteDay = (idx) => { showConfirm('刪除整天？', () => { sharedData.tripData.splice(idx, 1); saveShared(); }); };
-        window.editDayHeader = (idx) => { const d = sharedData.tripData[idx]; showEditDayModal(d.date, d.title, (nD, nT) => { d.date = nD; d.title = nT; saveShared(); }); };
+        window.deletePlanEvent = (dIdx, eId) => { showConfirm('刪除？', () => { sharedData.tripData[dIdx].events = sharedData.tripData[dIdx].events.filter(e => String(e.id) !== String(eId)); saveShared(); renderPlan(); }); };
+        window.addNewDay = () => { sharedData.tripData.push({ day: `第${sharedData.tripData.length+1}天`, date: "日期", title: "點擊編輯", events: [] }); saveShared(); renderPlan(); };
+        window.deleteDay = (idx) => { showConfirm('刪除整天？', () => { sharedData.tripData.splice(idx, 1); saveShared(); renderPlan(); }); };
+        window.editDayHeader = (idx) => { const d = sharedData.tripData[idx]; showEditDayModal(d.date, d.title, (nD, nT) => { d.date = nD; d.title = nT; saveShared(); renderPlan(); }); };
+
         window.addGuideItem = () => {
             const title = document.getElementById('guide-title').value, desc = document.getElementById('guide-desc').value, tip = document.getElementById('guide-tip').value;
             if(!title) return;
-            sharedData.guideData.push({ id: Date.now(), title, desc, tip }); saveShared(); window.toggleGuideForm();
+            sharedData.guideData.push({ id: Date.now(), title, desc, tip }); saveShared(); window.toggleGuideForm(); renderGuide();
         };
         document.getElementById('save-guide-btn').onclick = () => {
             const title = document.getElementById('edit-guide-title').value, desc = document.getElementById('edit-guide-desc').value, tip = document.getElementById('edit-guide-tip').value;
             const idx = sharedData.guideData.findIndex(i => i.title === title);
             if(idx >= 0) { sharedData.guideData[idx].desc = desc; sharedData.guideData[idx].tip = tip; } else { sharedData.guideData.push({ id: Date.now(), title, desc, tip }); }
-            saveShared(); closeModal('edit-guide-modal');
+            saveShared(); closeModal('edit-guide-modal'); renderGuide();
         };
+
         window.initWallet = () => loadExpenses();
         window.addExpense = async () => {
             const name = document.getElementById('expense-name').value;
@@ -308,15 +350,17 @@
             saveLocal(); loadExpenses(); document.getElementById('expense-name').value = ''; document.getElementById('expense-amount').value = ''; fileInput.value = ''; showToast('已記帳');
         };
         window.deleteExpense = (id) => { showConfirm('刪除？', () => { localData.expenses = localData.expenses.filter(e => String(e.id) !== String(id)); saveLocal(); loadExpenses(); }); };
+
         window.addChecklistItem = () => { const val = document.getElementById('new-checklist-item').value; if(val) { localData.checklist.push({text: val, checked: false}); saveLocal(); renderChecklist(); document.getElementById('new-checklist-item').value = ''; } };
         window.toggleCheck = (i) => { localData.checklist[i].checked = !localData.checklist[i].checked; saveLocal(); renderChecklist(); };
         window.deleteChecklistItem = (i) => { showConfirm('刪除？', () => { localData.checklist.splice(i, 1); saveLocal(); renderChecklist(); }); };
         window.initMemo = () => { document.getElementById('memo-area').addEventListener('input', (e) => { localData.memo = e.target.value; clearTimeout(window.saveTimeout); window.saveTimeout = setTimeout(saveLocal, 500); }); document.getElementById('memo-area').value = localData.memo; parseMemoLinks(); };
-        window.saveAppSettings = () => { sharedData.appSettings = { title: document.getElementById('setting-title').value, date: document.getElementById('setting-date').value }; saveShared(); showToast('設定已儲存'); };
+        
+        window.saveAppSettings = () => { sharedData.appSettings = { title: document.getElementById('setting-title').value, date: document.getElementById('setting-date').value }; saveShared(); renderAppSettings(); showToast('設定已儲存'); };
         window.saveFlightInfo = () => { sharedData.flightData = { depAirport: document.getElementById('edit-dep-airport').value, depTime: document.getElementById('edit-dep-time').value, arrAirport: document.getElementById('edit-arr-airport').value, arrTime: document.getElementById('edit-arr-time').value, flightNum: document.getElementById('edit-flight-num').value }; saveShared(); closeModal('edit-flight-modal'); initFlightInfo(); showToast('航班已更新'); };
         window.openEditGuideModal = (t, d, tip) => { document.getElementById('edit-guide-title').value = t; document.getElementById('edit-guide-desc').value = d; document.getElementById('edit-guide-tip').value = tip; document.getElementById('edit-guide-search').href = `https://www.google.com/search?q=${encodeURIComponent(t + " 介紹")}`; document.getElementById('edit-guide-modal').classList.add('active'); };
         window.openFlightModal = () => { const d = sharedData.flightData || {}; document.getElementById('edit-dep-airport').value = d.depAirport || ""; document.getElementById('edit-dep-time').value = d.depTime || ""; document.getElementById('edit-arr-airport').value = d.arrAirport || ""; document.getElementById('edit-arr-time').value = d.arrTime || ""; document.getElementById('edit-flight-num').value = d.flightNum || ""; document.getElementById('edit-flight-modal').classList.add('active'); };
-        window.clearAllData = () => { showConfirm("重置？", async () => { sharedData = { tripData: [], guideData: [], flightData: {}, appSettings: {} }; localData = { expenses: [], checklist: [], memo: "" }; await saveShared(); saveLocal(); location.reload(); }); };
+        window.clearAllData = () => { showConfirm("重置所有？", async () => { sharedData = { tripData: [], guideData: [], flightData: {}, appSettings: {} }; localData = { expenses: [], checklist: [], memo: "" }; await saveShared(); saveLocal(); location.reload(); }); };
         window.switchTab = (tabId) => { document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active')); document.getElementById(`tab-${tabId}`).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active')); document.querySelector(`.nav-btn[data-target="${tabId}"]`).classList.add('active'); window.scrollTo(0,0); localStorage.setItem('activeTab', tabId); if(tabId === 'guide') renderGuide(); };
         window.toggleDarkMode = () => { const isDark = document.documentElement.classList.toggle('dark'); localStorage.setItem('darkMode', isDark); updateDarkModeIcon(isDark); };
         function updateDarkModeIcon(isDark) { const i = document.getElementById('dark-mode-icon'); if(isDark) { i.className = 'fa-solid fa-sun text-lg'; } else { i.className = 'fa-solid fa-moon text-lg'; } }
@@ -345,6 +389,8 @@
         function renderPlan() {
             const container = document.getElementById('itinerary-container'); const daySelect = document.getElementById('plan-day-select');
             let html = ''; let selectHtml = '';
+            // Add day if empty
+            if(!sharedData.tripData || sharedData.tripData.length === 0) { sharedData.tripData = [{ day: "第一天", date: "日期", title: "點擊編輯", events: [] }]; }
             sharedData.tripData.forEach((day, index) => {
                 selectHtml += `<option value="${index}">${day.day} (${day.date})</option>`;
                 let eventsHtml = '';
