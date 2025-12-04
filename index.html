@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>日本旅遊小幫手</title>
+    
+    <!-- PWA / Mobile App Config -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="日本旅遊">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#f4f4f0">
+    <link rel="apple-touch-icon" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/sprites/solid.svg"> 
+    
+    <!-- Android Manifest (Embedded Data URI) - 修正 Android 識別問題 -->
+    <link rel="manifest" href='data:application/manifest+json,%7B%22name%22%3A%22%E6%97%A5%E6%9C%AC%E6%97%85%E9%81%8A%E5%B0%8F%E5%B9%AB%E6%89%8B%22%2C%22short_name%22%3A%22%E6%97%A5%E6%9C%AC%E6%97%85%E9%81%8A%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f4f4f0%22%2C%22theme_color%22%3A%22%23f4f4f0%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F827%2F827056.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D'>
+
+    <!-- Fonts: Noto Sans TC/JP & Serif for Muji Vibe -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Configuration for Muji Style Colors & Dark Mode -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Enable class-based dark mode
+            theme: {
+                extend: {
+                    colors: {
+                        muji: {
+                            base: '#f4f4f0', // 米白底色
+                            text: '#444444', // 深灰文字
+                            accent: '#7b7b7b', // 次要文字
+                            card: '#ffffff', // 卡片白
+                            primary: '#8c8c88', // 橄欖灰主色
+                            alert: '#bf6a6a', // 柔和紅
+                            highlight: '#d4d4d0' // 柔和選取
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                        serif: ['"Noto Serif TC"', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Global Styles */
+        body {
+            background-color: #e5e5e5; /* Desktop background */
+            font-family: 'Noto Sans TC', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.3s;
+            overscroll-behavior-y: none; /* Prevent pull-to-refresh on mobile app mode */
+        }
+        
+        html.dark body {
+            background-color: #111;
+        }
+        
+        #app-container {
+            background-color: #f4f4f0;
+            color: #444444;
+            min-height: 100vh;
+            /* Safe area padding for notched phones */
+            padding-top: env(safe-area-inset-top); 
+            padding-bottom: calc(80px + env(safe-area-inset-bottom));
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        html.dark #app-container {
+            background-color: #1c1917; 
+            color: #e5e7eb; 
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .muji-checkbox:checked {
+            background-color: #8c8c88;
+            border-color: #8c8c88;
+        }
+
+        .map-container iframe {
+            width: 100%; height: 100%; border-radius: 0.5rem; filter: grayscale(20%);
+        }
+        html.dark .map-container iframe {
+            filter: grayscale(20%) invert(90%) hue-rotate(180deg);
+        }
+
+        /* --- CUSTOM MODAL STYLES --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.2s;
+            backdrop-filter: blur(2px);
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .modal-box {
+            background: white;
+            width: 85%; max-width: 320px;
+            border-radius: 16px; padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: scale(0.95); transition: transform 0.2s;
+        }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        
+        html.dark .modal-box {
+            background: #292524; color: #e5e5e5; border: 1px solid #44403c;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: rgba(40, 40, 40, 0.9); color: white;
+            padding: 10px 20px; border-radius: 50px; font-size: 13px;
+            opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 3000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast.active { opacity: 1; transform: translateX(-50%) translateY(0); }
+        html.dark .toast { background: rgba(255, 255, 255, 0.9); color: #1c1917; }
+    </style>
+</head>
+<body>
+
+    <!-- Main Mobile Container -->
+    <div id="app-container" class="max-w-md mx-auto relative overflow-hidden">
+        
+        <!-- Header -->
+        <header class="bg-muji-base dark:bg-stone-900 sticky top-0 z-50 px-6 py-4 border-b border-stone-200 dark:border-stone-800 flex justify-between items-center bg-opacity-95 backdrop-blur-sm transition-colors duration-300">
+            <div>
+                <h1 id="app-title" class="font-serif text-xl font-bold text-muji-text dark:text-stone-100 tracking-widest">東京旅遊</h1>
+                <p id="app-date" class="text-xs text-muji-accent dark:text-stone-400 mt-0.5">2026.01.11 - 01.18</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleDarkMode()" class="text-muji-primary dark:text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition p-1">
+                    <i id="dark-mode-icon" class="fa-solid fa-moon text-lg"></i>
+                </button>
+                <a id="weather-link" href="https://www.jma.go.jp/bosai/forecast/" target="_blank" class="flex items-center gap-1 text-muji-primary dark:text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition p-1 no-underline">
+                    <i id="weather-icon-i" class="fa-solid fa-cloud-sun text-xl"></i>
+                    <span id="weather-temp" class="text-xs font-sans font-bold hidden">--°C</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- CONTENT AREAS -->
+        <main class="p-4">
+
+            <!-- 1. PLAN (行程表) -->
+            <div id="tab-plan" class="tab-content active">
+                
+                <!-- Flight Info Card (Editable) -->
+                <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6 transition-colors duration-300 relative group">
+                    <button onclick="openFlightModal()" class="absolute top-3 right-3 text-stone-300 hover:text-stone-500 dark:hover:text-stone-300 p-2"><i class="fa-solid fa-pen text-xs"></i></button>
+                    <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3 uppercase tracking-wide border-b border-stone-100 dark:border-stone-700 pb-2">航班資訊</h3>
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="text-center">
+                            <div id="disp-dep-airport" class="text-2xl font-serif font-bold text-muji-text dark:text-stone-100">TPE</div>
+                            <div id="disp-dep-time" class="text-xs text-muji-accent dark:text-stone-400">02:30</div>
+                        </div>
+                        <div class="flex-1 px-4 text-center">
+                            <i class="fa-solid fa-plane text-muji-primary dark:text-stone-500 text-sm"></i>
+                            <div class="h-[1px] bg-stone-300 dark:bg-stone-600 w-full mt-1"></div>
+                            <div id="disp-flight-num" class="text-[10px] text-muji-accent dark:text-stone-500 mt-1">捷星 GK12</div>
+                        </div>
+                        <div class="text-center">
+                            <div id="disp-arr-airport" class="text-2xl font-serif font-bold text-muji-text dark:text-stone-100">NRT</div>
+                            <div id="disp-arr-time" class="text-xs text-muji-accent dark:text-stone-400">06:35</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Event Button -->
+                <button onclick="togglePlanForm()" class="w-full mb-6 border-2 border-dashed border-stone-300 dark:border-stone-700 text-stone-400 dark:text-stone-500 rounded-xl p-3 flex flex-col items-center justify-center hover:bg-stone-50 dark:hover:bg-stone-800 transition group active:scale-95">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-plus text-lg group-hover:scale-110 transition-transform"></i>
+                        <span class="text-xs font-bold">新增行程項目</span>
+                    </div>
+                </button>
+
+                <!-- Add Plan Form -->
+                <div id="add-plan-form" class="hidden bg-white dark:bg-stone-800 p-5 rounded-xl shadow-lg border border-stone-100 dark:border-stone-700 mb-6 transition-all duration-300">
+                    <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3">新增行程</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">選擇日期</label>
+                            <select id="plan-day-select" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2"></select>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="w-1/3">
+                                <label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">時間</label>
+                                <input type="time" id="plan-time" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-2 py-2">
+                            </div>
+                            <div class="w-2/3">
+                                <label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">類型</label>
+                                <select id="plan-type" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2">
+                                    <option value="spot">景點 (Spot)</option>
+                                    <option value="food">美食 (Food)</option>
+                                    <option value="transport">交通 (Transport)</option>
+                                    <option value="shopping">購物 (Shopping)</option>
+                                    <option value="hotel">住宿 (Hotel)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">行程內容</label>
+                            <input type="text" id="plan-text" placeholder="例：前往淺草寺參拜" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">Google Maps 連結 (選填)</label>
+                            <input type="text" id="plan-link" placeholder="貼上地圖網址" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="plan-important" class="muji-checkbox w-4 h-4 rounded text-amber-500 focus:ring-amber-500">
+                            <label for="plan-important" class="text-xs text-stone-600 dark:text-stone-300">標記為重要行程</label>
+                        </div>
+                        <div class="flex gap-2 pt-2">
+                            <button onclick="togglePlanForm()" class="flex-1 bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 rounded-lg text-xs py-2">取消</button>
+                            <button onclick="addPlanEvent()" class="flex-1 bg-stone-700 dark:bg-stone-600 text-white rounded-lg text-xs font-bold py-2">新增</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Itinerary Timeline -->
+                <div id="itinerary-container" class="space-y-6">
+                    <!-- Rendered by JS -->
+                </div>
+
+                <!-- Add Day Button -->
+                 <div class="text-center mt-6 mb-8">
+                    <button onclick="addNewDay()" class="text-xs text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 border border-stone-200 dark:border-stone-700 px-4 py-2 rounded-full transition active:bg-stone-100 dark:active:bg-stone-800">
+                        <i class="fa-solid fa-plus mr-1"></i> 新增一天 (Day)
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. GUIDE (深度導覽) -->
+            <div id="tab-guide" class="tab-content">
+                <div class="mb-6">
+                    <h2 class="font-serif text-2xl text-muji-text dark:text-stone-100 mb-2">深度導覽</h2>
+                    <p class="text-sm text-muji-accent dark:text-stone-400">已自動同步行程中的「景點」。</p>
+                </div>
+
+                <button onclick="toggleGuideForm()" class="w-full mb-6 border-2 border-dashed border-stone-300 dark:border-stone-700 text-stone-400 dark:text-stone-500 rounded-xl p-4 flex flex-col items-center justify-center hover:bg-stone-50 dark:hover:bg-stone-800 transition group active:scale-95">
+                    <i class="fa-solid fa-plus text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-xs font-bold">手動新增導覽</span>
+                </button>
+
+                <div id="add-guide-form" class="hidden bg-white dark:bg-stone-800 p-5 rounded-xl shadow-lg border border-stone-100 dark:border-stone-700 mb-6">
+                    <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3">撰寫新導覽</h3>
+                    <div class="space-y-3">
+                        <input type="text" id="guide-title" placeholder="景點名稱 (如: 清水寺)" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2">
+                        <textarea id="guide-desc" rows="4" placeholder="介紹內容 (歷史背景、特色...)" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2 resize-none"></textarea>
+                        <input type="text" id="guide-tip" placeholder="冷知識 / 小撇步 (選填)" class="w-full bg-stone-100 dark:bg-stone-700 dark:text-white border-none rounded-lg text-xs px-3 py-2 text-stone-600 placeholder-stone-400">
+                        <div class="flex gap-2 pt-2">
+                            <button onclick="toggleGuideForm()" class="flex-1 bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 rounded-lg text-xs py-2">取消</button>
+                            <button onclick="addGuideItem()" class="flex-1 bg-stone-700 dark:bg-stone-600 text-white rounded-lg text-xs font-bold py-2">新增</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="guide-container"></div>
+            </div>
+
+            <!-- 3. WALLET (記帳) -->
+            <div id="tab-wallet" class="tab-content">
+                <div class="bg-stone-800 dark:bg-black text-stone-100 p-5 rounded-xl shadow-lg mb-6 relative overflow-hidden transition-colors duration-300">
+                    <div class="absolute -right-4 -top-4 text-stone-700 dark:text-stone-800 opacity-20 text-9xl">
+                        <i class="fa-solid fa-coins"></i>
+                    </div>
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="text-xs text-stone-400" id="rate-status">當前匯率 (日幣/台幣)</div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="initWallet()" class="text-stone-500 hover:text-stone-300 text-xs"><i class="fa-solid fa-rotate-right"></i></button>
+                            <input type="number" id="exchange-rate" value="0.22" step="0.0001" class="w-20 bg-stone-700 dark:bg-stone-900 border-none rounded text-center text-sm text-white focus:ring-1 focus:ring-stone-500">
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <input type="text" id="calc-input" placeholder="輸入金額 (如 500+200)" class="w-full bg-transparent text-3xl font-mono text-right border-b border-stone-600 focus:outline-none focus:border-stone-400 pb-2 placeholder-stone-600 dark:placeholder-stone-700">
+                    </div>
+                    <div class="flex justify-end items-end gap-2">
+                        <div class="text-stone-400 text-sm">≈ NT$</div>
+                        <div id="calc-result-twd" class="text-xl font-bold">0</div>
+                    </div>
+                </div>
+
+                <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6 transition-colors duration-300">
+                    <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-4">新增消費</h3>
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="expense-name" placeholder="品項 (如: 拉麵)" class="flex-1 bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-3 focus:ring-1 focus:ring-stone-400 placeholder-stone-400">
+                        <input type="number" id="expense-amount" placeholder="¥" class="w-24 bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-3 focus:ring-1 focus:ring-stone-400 placeholder-stone-400">
+                    </div>
+                    <div class="flex gap-2">
+                        <label class="flex-1 bg-stone-100 dark:bg-stone-700 text-stone-500 dark:text-stone-300 rounded-lg flex items-center justify-center gap-2 cursor-pointer hover:bg-stone-200 dark:hover:bg-stone-600 transition py-3">
+                            <i class="fa-solid fa-camera"></i>
+                            <span class="text-xs">拍照</span>
+                            <input type="file" id="expense-photo" accept="image/*" capture="environment" class="hidden">
+                        </label>
+                        <button onclick="addExpense()" class="flex-1 bg-stone-700 dark:bg-stone-600 text-white rounded-lg text-sm font-bold hover:bg-stone-800 dark:hover:bg-stone-500 transition py-3">儲存</button>
+                    </div>
+                    <div id="photo-preview-name" class="text-xs text-muji-primary dark:text-stone-400 mt-2 hidden text-center truncate"></div>
+                </div>
+
+                <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3 px-1">消費紀錄</h3>
+                <div id="expense-list" class="space-y-3 pb-20"></div>
+            </div>
+
+            <!-- 4. LISTS (清單) -->
+            <div id="tab-lists" class="tab-content">
+                <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6 transition-colors duration-300">
+                    <div class="flex justify-between items-center mb-4 border-b border-stone-100 dark:border-stone-700 pb-2">
+                        <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 uppercase">行前準備清單</h3>
+                        <span id="checklist-progress" class="text-xs bg-stone-200 dark:bg-stone-700 px-2 py-0.5 rounded text-stone-600 dark:text-stone-300">0/0</span>
+                    </div>
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" id="new-checklist-item" placeholder="新增自訂項目..." class="flex-1 bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2 focus:ring-1 focus:ring-stone-400 placeholder-stone-400 transition-colors duration-300">
+                        <button onclick="addChecklistItem()" class="bg-stone-700 dark:bg-stone-600 text-white rounded-lg px-4 py-2 text-sm hover:bg-stone-800 dark:hover:bg-stone-500 transition shadow-sm">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <ul id="checklist-container" class="space-y-3"></ul>
+                </div>
+
+                <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 transition-colors duration-300">
+                    <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3 uppercase">個人備忘錄</h3>
+                    <textarea id="memo-area" class="w-full h-40 bg-muji-base dark:bg-stone-900 dark:text-white rounded-lg p-3 text-sm text-muji-text focus:outline-none focus:ring-1 focus:ring-stone-400 resize-none leading-relaxed placeholder-stone-400" placeholder="在此輸入任何文字..."></textarea>
+                    <div class="flex justify-between mt-2">
+                        <span class="text-[10px] text-muji-accent dark:text-stone-500 pt-1">自動儲存</span>
+                        <button onclick="parseMemoLinks()" class="text-xs text-stone-500 dark:text-stone-400 underline">更新連結</button>
+                    </div>
+                    <div id="memo-links" class="mt-3 flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+
+            <!-- 5. INFO (資訊) -->
+            <div id="tab-info" class="tab-content">
+                <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6 transition-colors duration-300">
+                    <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-4 uppercase border-b border-stone-100 dark:border-stone-700 pb-2">旅程設定</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">旅程標題</label>
+                            <input type="text" id="setting-title" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">日期範圍</label>
+                            <input type="text" id="setting-date" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2">
+                        </div>
+                        <button onclick="saveAppSettings()" class="w-full bg-stone-700 dark:bg-stone-600 text-white rounded-lg text-sm font-bold hover:bg-stone-800 dark:hover:bg-stone-500 transition py-2 mt-2">儲存設定</button>
+                    </div>
+                </div>
+                
+                <!-- Weather and Police Links -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <a href="https://www.jma.go.jp/jma/index.html" target="_blank" class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl text-center border border-blue-100 dark:border-blue-900/30 block transition-colors duration-300">
+                        <i class="fa-solid fa-cloud-sun-rain text-2xl text-blue-400 mb-2"></i>
+                        <div class="text-sm font-bold text-stone-600 dark:text-stone-200">天氣預報</div>
+                        <div class="text-[10px] text-stone-400 dark:text-stone-500">日本氣象廳</div>
+                    </a>
+                    <a href="https://www.google.com/maps/search/Police+Station" target="_blank" class="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl text-center border border-red-100 dark:border-red-900/30 block transition-colors duration-300">
+                        <i class="fa-solid fa-shield-halved text-2xl text-red-400 mb-2"></i>
+                        <div class="text-sm font-bold text-stone-600 dark:text-stone-200">警察局</div>
+                        <div class="text-[10px] text-stone-400 dark:text-stone-500">直撥 110</div>
+                    </a>
+                </div>
+
+                <!-- Emergency Info - RESTORED -->
+                <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6 transition-colors duration-300">
+                    <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3 uppercase border-b border-stone-100 dark:border-stone-700 pb-2">緊急聯絡</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-muji-text dark:text-stone-200">救護車 / 火警</span>
+                            <span class="font-bold text-red-500 font-mono">119</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-muji-text dark:text-stone-200">大阪辦事處 (緊急聯絡)</span>
+                            <span class="font-bold text-muji-text dark:text-stone-200 font-mono">+81-90-8794-4568</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Travel Tips - RESTORED -->
+                <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 transition-colors duration-300">
+                    <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3 uppercase border-b border-stone-100 dark:border-stone-700 pb-2">旅遊小撇步</h3>
+                    <ul class="text-sm text-muji-text dark:text-stone-300 space-y-2 list-disc list-inside marker:text-stone-400">
+                        <li>日本電壓 100V，插頭為雙平腳（與台灣相同）。</li>
+                        <li>搭乘手扶梯：關東站左邊、關西站右邊。</li>
+                        <li>室內、大眾運輸工具內請保持安靜。</li>
+                        <li>計程車門會自動開關，請勿動手去拉。</li>
+                        <li>結帳時請將錢放在櫃檯的托盤上。</li>
+                    </ul>
+                </div>
+
+                <div class="text-center mt-8 mb-4">
+                    <button onclick="clearAllData()" class="text-xs text-red-300 border border-red-100 dark:border-red-900/50 px-3 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500">重置所有資料</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Modals and Toasts -->
+        <div id="confirm-modal" class="modal-overlay">
+            <div class="modal-box">
+                <h3 class="font-bold text-lg mb-2 text-muji-text dark:text-stone-100">確認操作</h3>
+                <p id="confirm-message" class="text-sm text-muji-accent dark:text-stone-400 mb-6"></p>
+                <div class="flex justify-end gap-3">
+                    <button onclick="closeModal('confirm-modal')" class="px-4 py-2 rounded-lg text-sm text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-700 transition">取消</button>
+                    <button id="confirm-btn" class="px-4 py-2 rounded-lg text-sm bg-stone-700 text-white hover:bg-stone-800 dark:bg-stone-600 dark:hover:bg-stone-500 transition">確定</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="edit-day-modal" class="modal-overlay">
+            <div class="modal-box">
+                <h3 class="font-bold text-lg mb-4 text-muji-text dark:text-stone-100">編輯行程標題</h3>
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-xs text-stone-500 mb-1">日期 (如: 10/20)</label>
+                        <input type="text" id="edit-day-date" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white border-none rounded-lg p-2 focus:ring-2 focus:ring-stone-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-stone-500 mb-1">主題 (如: 迪士尼)</label>
+                        <input type="text" id="edit-day-title" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white border-none rounded-lg p-2 focus:ring-2 focus:ring-stone-400">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button onclick="closeModal('edit-day-modal')" class="px-4 py-2 rounded-lg text-sm text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-700 transition">取消</button>
+                    <button id="save-day-btn" class="px-4 py-2 rounded-lg text-sm bg-stone-700 text-white hover:bg-stone-800 dark:bg-stone-600 dark:hover:bg-stone-500 transition">儲存</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="edit-guide-modal" class="modal-overlay">
+            <div class="modal-box">
+                <h3 class="font-bold text-lg mb-4 text-muji-text dark:text-stone-100">編輯景點介紹</h3>
+                <div class="space-y-3 mb-6">
+                    <input type="hidden" id="edit-guide-id">
+                    <div class="flex gap-2">
+                        <input type="text" id="edit-guide-title" placeholder="景點名稱" class="flex-1 bg-stone-100 dark:bg-stone-900 dark:text-white border-none rounded-lg p-2 text-sm" readonly>
+                        <a id="edit-guide-search" href="#" target="_blank" class="bg-blue-100 text-blue-600 px-3 py-2 rounded-lg flex items-center justify-center hover:bg-blue-200 transition"><i class="fa-brands fa-google"></i></a>
+                    </div>
+                    <textarea id="edit-guide-desc" rows="5" placeholder="輸入介紹內容..." class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white border-none rounded-lg p-2 text-sm resize-none"></textarea>
+                    <input type="text" id="edit-guide-tip" placeholder="冷知識 (選填)" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white border-none rounded-lg p-2 text-sm">
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button onclick="closeModal('edit-guide-modal')" class="px-4 py-2 rounded-lg text-sm text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-700 transition">取消</button>
+                    <button id="save-guide-btn" class="px-4 py-2 rounded-lg text-sm bg-stone-700 text-white hover:bg-stone-800 dark:bg-stone-600 dark:hover:bg-stone-500 transition">儲存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW FLIGHT MODAL -->
+        <div id="edit-flight-modal" class="modal-overlay">
+            <div class="modal-box">
+                <h3 class="font-bold text-lg mb-4 text-muji-text dark:text-stone-100">編輯航班資訊</h3>
+                <div class="space-y-3 mb-6">
+                    <div class="flex gap-2">
+                        <div class="flex-1">
+                            <label class="block text-xs text-stone-500 mb-1">出發機場</label>
+                            <input type="text" id="edit-dep-airport" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white border-none rounded-lg p-2 text-sm">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-xs text-stone-500 mb-1">時間</label>
+                            <input type="time" id="edit-dep-time" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white border-none rounded-lg p-2 text-sm">
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="flex-1">
+                            <label class="block text-xs text-stone-500 mb-1">抵達機場</label>
+                            <input type="text" id="edit-arr-airport" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white border-none rounded-lg p-2 text-sm">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-xs text-stone-500 mb-1">時間</label>
+                            <input type="time" id="edit-arr-time" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white border-none rounded-lg p-2 text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-stone-500 mb-1">航班代號</label>
+                        <input type="text" id="edit-flight-num" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white border-none rounded-lg p-2 text-sm">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button onclick="closeModal('edit-flight-modal')" class="px-4 py-2 rounded-lg text-sm text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-700 transition">取消</button>
+                    <button onclick="saveFlightInfo()" class="px-4 py-2 rounded-lg text-sm bg-stone-700 text-white hover:bg-stone-800 dark:bg-stone-600 dark:hover:bg-stone-500 transition">儲存</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="toast" class="toast">訊息提示</div>
+
+        <!-- Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 px-2 py-2 flex justify-around items-end z-50 text-[10px] font-medium text-stone-400 pb-safe transition-colors duration-300">
+            <button onclick="switchTab('plan')" class="nav-btn active flex flex-col items-center gap-1 p-2 w-1/5 text-muji-primary dark:text-stone-500" data-target="plan">
+                <i class="fa-regular fa-calendar-days text-lg mb-0.5"></i>
+                <span>行程</span>
+            </button>
+            <button onclick="switchTab('guide')" class="nav-btn flex flex-col items-center gap-1 p-2 w-1/5 hover:text-stone-600 dark:hover:text-stone-300 transition" data-target="guide">
+                <i class="fa-solid fa-book-open text-lg mb-0.5"></i>
+                <span>導覽</span>
+            </button>
+            <button onclick="switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1 p-2 w-1/5 -mt-6" data-target="wallet">
+                <div class="bg-stone-700 dark:bg-stone-200 text-white dark:text-stone-900 rounded-full w-12 h-12 flex items-center justify-center shadow-lg transform active:scale-95 transition">
+                    <i class="fa-solid fa-wallet text-xl"></i>
+                </div>
+                <span class="mt-1">錢包</span>
+            </button>
+            <button onclick="switchTab('lists')" class="nav-btn flex flex-col items-center gap-1 p-2 w-1/5 hover:text-stone-600 dark:hover:text-stone-300 transition" data-target="lists">
+                <i class="fa-solid fa-list-check text-lg mb-0.5"></i>
+                <span>清單</span>
+            </button>
+            <button onclick="switchTab('info')" class="nav-btn flex flex-col items-center gap-1 p-2 w-1/5 hover:text-stone-600 dark:hover:text-stone-300 transition" data-target="info">
+                <i class="fa-solid fa-circle-info text-lg mb-0.5"></i>
+                <span>資訊</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA & STATE ---
+        const defaultTripData = [
+            {
+                day: "第一天", date: "請點擊編輯日期", title: "點擊編輯標題",
+                events: []
+            }
+        ];
+        const defaultChecklist = [
+            "護照 (Passport)", "日幣現金", "信用卡 (海外回饋高)", "Visit Japan Web 填寫",
+            "Sim卡 / 漫遊開通", "行動電源", "個人常備藥品", "雨具 (摺疊傘)", "環保購物袋"
+        ];
+        // Built-in Knowledge Base for "AI-like" auto generation
+        const knownLocations = {
+            "淺草寺": { desc: "東京都內最古老的寺廟，以雷門的大紅燈籠聞名。仲見世通商店街有許多傳統小吃與紀念品。", tip: "求籤如果是「凶」，請將籤詩綁在架子上化解；如果是「吉」則可以帶回家。" },
+            "雷門": { desc: "淺草寺的表參道入口，巨大的紅色燈籠是東京最著名的地標之一。", tip: "燈籠底部有龍的雕刻，記得抬頭看看！" },
+            "晴空塔": { desc: "世界最高的自立式電波塔（634公尺），可眺望整個關東地區，天氣好時甚至能看到富士山。", tip: "樓下的 Solamachi 商場非常好逛，有很多限定伴手禮。" },
+            "東京鐵塔": { desc: "東京的經典象徵，紅白相間的鐵塔在夜間點燈後特別迷人。", tip: "有「Top Deck Tour」可以預約登上更高的展望台。" },
+            "明治神宮": { desc: "供奉明治天皇與昭憲皇太后的神社，擁有廣大的森林綠地，是都市中的綠洲。", tip: "這裡的鳥居是用台灣丹大山的扁柏製成的。" },
+            "築地場外市場": { desc: "雖然場內市場已搬遷至豐洲，但場外市場依然熱鬧，充滿新鮮海鮮與玉子燒。", tip: "建議早上前往，許多店家下午就會打烊。" },
+            "澀谷 SKY": { desc: "位於 Shibuya Scramble Square 頂樓的露天展望台，擁有 360 度無死角美景。", tip: "日落時段最熱門，務必提前一個月上網預約。" },
+            "東京迪士尼樂園": { desc: "夢想與魔法的王國，擁有灰姑娘城堡與經典迪士尼角色的遊行。", tip: "下載官方 App 可以抽取快速通關與預約餐廳。" },
+            "東京迪士尼海洋": { desc: "全球唯一的海洋主題迪士尼，氣氛較為浪漫成熟，擁有許多刺激設施。", tip: "達菲熊 (Duffy) 相關商品只有在這裡買得到喔！" },
+            "上野公園": { desc: "賞櫻名所，園內有動物園、博物館與美術館，充滿文化氣息。", tip: "上野動物園的熊貓是人氣明星。" },
+            "阿美橫丁": { desc: "充滿活力的商店街，藥妝、零食、海鮮、球鞋都可以在這裡便宜入手。", tip: "殺價是這裡的一種文化（雖然現在比較少見了）。" },
+            "新宿御苑": { desc: "橫跨新宿與澀谷的廣大庭園，融合了日式、英式與法式庭園風格。", tip: "這裡是新海誠電影《言葉之庭》的取景地。" }
+        };
+
+        const defaultGuideData = [];
+        const defaultFlightData = {
+            depAirport: "TPE", depTime: "02:30",
+            arrAirport: "NRT", arrTime: "06:35",
+            flightNum: "捷星 GK12"
+        };
+
+        // --- UI UTILS (Modal & Toast) ---
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 2500);
+        }
+
+        let confirmCallback = null;
+        function showConfirm(msg, callback) {
+            document.getElementById('confirm-message').innerText = msg;
+            confirmCallback = callback;
+            document.getElementById('confirm-modal').classList.add('active');
+        }
+
+        let editDayCallback = null;
+        function showEditDayModal(date, title, callback) {
+            document.getElementById('edit-day-date').value = date;
+            document.getElementById('edit-day-title').value = title;
+            editDayCallback = callback;
+            document.getElementById('edit-day-modal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        document.getElementById('confirm-btn').addEventListener('click', () => {
+            if(confirmCallback) confirmCallback();
+            closeModal('confirm-modal');
+        });
+
+        document.getElementById('save-day-btn').addEventListener('click', () => {
+            const date = document.getElementById('edit-day-date').value;
+            const title = document.getElementById('edit-day-title').value;
+            if(editDayCallback) editDayCallback(date, title);
+            closeModal('edit-day-modal');
+        });
+
+        // --- GUIDE MODAL HANDLERS ---
+        document.getElementById('save-guide-btn').addEventListener('click', () => {
+            const title = document.getElementById('edit-guide-title').value;
+            const desc = document.getElementById('edit-guide-desc').value;
+            const tip = document.getElementById('edit-guide-tip').value;
+            
+            let guideData = JSON.parse(localStorage.getItem('guideData')) || [];
+            const existingIndex = guideData.findIndex(item => item.title === title);
+            
+            if (existingIndex >= 0) {
+                guideData[existingIndex].desc = desc;
+                guideData[existingIndex].tip = tip;
+            } else {
+                guideData.push({ id: Date.now(), title, desc, tip });
+            }
+            
+            localStorage.setItem('guideData', JSON.stringify(guideData));
+            renderGuide(guideData); 
+            closeModal('edit-guide-modal');
+            showToast('介紹已儲存');
+        });
+
+        function openEditGuideModal(title, desc = "", tip = "") {
+            document.getElementById('edit-guide-title').value = title;
+            document.getElementById('edit-guide-desc').value = desc;
+            document.getElementById('edit-guide-tip').value = tip;
+            
+            // Set Google Search Link
+            const searchBtn = document.getElementById('edit-guide-search');
+            searchBtn.href = `https://www.google.com/search?q=${encodeURIComponent(title + " 介紹")}`;
+            
+            document.getElementById('edit-guide-modal').classList.add('active');
+        }
+
+        // --- APP INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initDarkMode(); 
+            initAppSettings();
+            initFlightInfo(); 
+            initWeather(); 
+            initPlan(); 
+            initGuide(); 
+            initWallet();
+            initLists();
+            initMemo();
+            loadTabs();
+        });
+
+        // --- FLIGHT INFO LOGIC ---
+        function initFlightInfo() {
+            const data = JSON.parse(localStorage.getItem('flightData')) || defaultFlightData;
+            document.getElementById('disp-dep-airport').innerText = data.depAirport;
+            document.getElementById('disp-dep-time').innerText = data.depTime;
+            document.getElementById('disp-arr-airport').innerText = data.arrAirport;
+            document.getElementById('disp-arr-time').innerText = data.arrTime;
+            document.getElementById('disp-flight-num').innerText = data.flightNum;
+        }
+
+        function openFlightModal() {
+            const data = JSON.parse(localStorage.getItem('flightData')) || defaultFlightData;
+            document.getElementById('edit-dep-airport').value = data.depAirport;
+            document.getElementById('edit-dep-time').value = data.depTime;
+            document.getElementById('edit-arr-airport').value = data.arrAirport;
+            document.getElementById('edit-arr-time').value = data.arrTime;
+            document.getElementById('edit-flight-num').value = data.flightNum;
+            document.getElementById('edit-flight-modal').classList.add('active');
+        }
+
+        function saveFlightInfo() {
+            const data = {
+                depAirport: document.getElementById('edit-dep-airport').value || "TPE",
+                depTime: document.getElementById('edit-dep-time').value || "00:00",
+                arrAirport: document.getElementById('edit-arr-airport').value || "NRT",
+                arrTime: document.getElementById('edit-arr-time').value || "00:00",
+                flightNum: document.getElementById('edit-flight-num').value || "FLIGHT"
+            };
+            localStorage.setItem('flightData', JSON.stringify(data));
+            initFlightInfo();
+            closeModal('edit-flight-modal');
+            showToast('航班資訊已更新');
+        }
+
+        // --- WEATHER LOGIC ---
+        function initWeather() {
+            const defaultLat = 35.6895;
+            const defaultLong = 139.6917;
+            const fetchWeatherData = async (lat, long) => {
+                try {
+                    const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current_weather=true`);
+                    const data = await response.json();
+                    if(data.current_weather) {
+                        const temp = Math.round(data.current_weather.temperature);
+                        const code = data.current_weather.weathercode;
+                        const tempEl = document.getElementById('weather-temp');
+                        tempEl.innerText = `${temp}°C`;
+                        tempEl.classList.remove('hidden');
+                        const iconEl = document.getElementById('weather-icon-i');
+                        iconEl.className = getWeatherIcon(code);
+                    }
+                } catch (e) { console.log("Weather fetch failed", e); }
+            };
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => fetchWeatherData(position.coords.latitude, position.coords.longitude),
+                    (error) => fetchWeatherData(defaultLat, defaultLong)
+                );
+            } else {
+                fetchWeatherData(defaultLat, defaultLong);
+            }
+        }
+
+        function getWeatherIcon(code) {
+            if(code === 0) return 'fa-solid fa-sun text-xl text-amber-500';
+            if(code <= 3) return 'fa-solid fa-cloud-sun text-xl text-stone-500 dark:text-stone-300';
+            if(code <= 48) return 'fa-solid fa-smog text-xl text-stone-400';
+            if(code <= 67) return 'fa-solid fa-cloud-rain text-xl text-blue-400';
+            if(code <= 77) return 'fa-solid fa-snowflake text-xl text-blue-200';
+            if(code <= 82) return 'fa-solid fa-cloud-showers-heavy text-xl text-blue-500';
+            if(code <= 86) return 'fa-solid fa-snowflake text-xl text-blue-200';
+            return 'fa-solid fa-bolt text-xl text-amber-600';
+        }
+
+        // --- DARK MODE LOGIC ---
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('darkMode', isDark);
+            updateDarkModeIcon(isDark);
+        }
+        function initDarkMode() {
+            const savedMode = localStorage.getItem('darkMode');
+            const isDark = savedMode !== 'false';
+            if (isDark) document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+            updateDarkModeIcon(isDark);
+        }
+        function updateDarkModeIcon(isDark) {
+            const icon = document.getElementById('dark-mode-icon');
+            if (isDark) { icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); } 
+            else { icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); }
+        }
+
+        // --- APP SETTINGS ---
+        function initAppSettings() {
+            const savedTitle = localStorage.getItem('appTitle') || '東京旅遊';
+            const savedDate = localStorage.getItem('appDate') || '2026.01.11 - 01.18';
+            document.getElementById('app-title').innerText = savedTitle;
+            document.getElementById('app-date').innerText = savedDate;
+            document.getElementById('setting-title').value = savedTitle;
+            document.getElementById('setting-date').value = savedDate;
+        }
+        function saveAppSettings() {
+            const title = document.getElementById('setting-title').value;
+            const date = document.getElementById('setting-date').value;
+            localStorage.setItem('appTitle', title);
+            localStorage.setItem('appDate', date);
+            document.getElementById('app-title').innerText = title;
+            document.getElementById('app-date').innerText = date;
+            showToast('設定已儲存！');
+        }
+
+        // --- MODULE: PLAN ---
+        function initPlan() {
+            try {
+                const stored = localStorage.getItem('tripData');
+                let data;
+                if (stored) {
+                    data = JSON.parse(stored);
+                    let migrated = false;
+                    data.forEach(day => {
+                        day.events.forEach(evt => {
+                            if(!evt.id) { evt.id = Date.now() + Math.random(); migrated = true; }
+                        });
+                    });
+                    if(migrated) localStorage.setItem('tripData', JSON.stringify(data));
+                } else {
+                    data = defaultTripData;
+                    localStorage.setItem('tripData', JSON.stringify(data));
+                }
+                renderPlan(data);
+            } catch (e) {
+                localStorage.setItem('tripData', JSON.stringify(defaultTripData));
+                renderPlan(defaultTripData);
+            }
+        }
+
+        function renderPlan(data) {
+            const container = document.getElementById('itinerary-container');
+            const daySelect = document.getElementById('plan-day-select');
+            let html = '';
+            let selectHtml = '';
+
+            data.forEach((day, index) => {
+                selectHtml += `<option value="${index}">${day.day} (${day.date})</option>`;
+                let eventsHtml = '';
+                day.events.sort((a, b) => a.time.localeCompare(b.time));
+
+                day.events.forEach((evt) => {
+                    const icon = getIconByType(evt.type);
+                    const highlightClass = evt.important ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-900/50' : 'bg-white border-transparent dark:bg-stone-800 dark:border-stone-700';
+                    const timeColor = evt.important ? 'text-amber-600 dark:text-amber-500 font-bold' : 'text-muji-text dark:text-stone-400';
+                    let actionBtn = evt.link ? `<a href="${evt.link}" target="_blank" class="ml-2 text-xs bg-stone-100 dark:bg-stone-700 px-2 py-0.5 rounded text-stone-500 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-600"><i class="fa-solid fa-map-location-dot"></i> 地圖</a>` : '';
+
+                    eventsHtml += `
+                        <div class="flex gap-4 relative group">
+                            <div class="flex flex-col items-center">
+                                <div class="w-2 h-2 rounded-full bg-stone-300 dark:bg-stone-600 mt-2"></div>
+                                <div class="w-0.5 flex-1 bg-stone-200 dark:bg-stone-700 my-1"></div>
+                            </div>
+                            <div class="flex-1 pb-6 relative">
+                                <button onclick="deletePlanEvent(${index}, ${evt.id})" class="absolute top-0 right-0 z-10 text-stone-300 hover:text-red-400 p-2"><i class="fa-solid fa-xmark"></i></button>
+                                <div class="text-xs ${timeColor} mb-0.5">${evt.time}</div>
+                                <div class="p-3 rounded-lg border shadow-sm ${highlightClass} transition-colors duration-300">
+                                    <div class="flex items-start gap-2">
+                                        <i class="${icon} text-stone-400 dark:text-stone-500 mt-1 text-xs"></i>
+                                        <div class="text-sm text-muji-text dark:text-stone-200 font-medium leading-tight pr-6">${evt.text}${actionBtn}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                });
+
+                html += `
+                    <div class="relative group">
+                        <div class="sticky top-16 z-10 bg-[#f4f4f0]/95 dark:bg-[#1c1917]/95 py-2 mb-2 border-b border-stone-200 dark:border-stone-800 backdrop-blur-sm transition-colors duration-300 flex justify-between items-end">
+                            <h2 class="font-serif font-bold text-lg text-muji-text dark:text-stone-100 flex items-baseline gap-2 cursor-pointer" onclick="editDayHeader(${index})">
+                                ${day.date} <span class="text-sm font-sans text-muji-accent dark:text-stone-500 font-normal">${day.day} - ${day.title}</span>
+                            </h2>
+                            <div class="flex gap-2">
+                                <button onclick="editDayHeader(${index})" class="text-stone-300 hover:text-stone-500 dark:hover:text-stone-300 text-xs p-2 bg-stone-100 dark:bg-stone-800 rounded-full"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteDay(${index})" class="text-stone-300 hover:text-red-400 text-xs p-2 bg-stone-100 dark:bg-stone-800 rounded-full"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="pl-2">${eventsHtml}</div>
+                    </div>`;
+            });
+            container.innerHTML = html;
+            daySelect.innerHTML = selectHtml;
+        }
+
+        function togglePlanForm() {
+            document.getElementById('add-plan-form').classList.toggle('hidden');
+        }
+
+        function addPlanEvent() {
+            const dayIndex = document.getElementById('plan-day-select').value;
+            const time = document.getElementById('plan-time').value;
+            const type = document.getElementById('plan-type').value;
+            const text = document.getElementById('plan-text').value;
+            const link = document.getElementById('plan-link').value;
+            const important = document.getElementById('plan-important').checked;
+
+            if (!time || !text) { showToast('請輸入時間與內容'); return; }
+
+            const data = JSON.parse(localStorage.getItem('tripData'));
+            data[dayIndex].events.push({ id: Date.now() + Math.random(), time, text, type, link, important });
+            localStorage.setItem('tripData', JSON.stringify(data));
+            renderPlan(data);
+            
+            document.getElementById('plan-text').value = '';
+            document.getElementById('plan-link').value = '';
+            document.getElementById('plan-important').checked = false;
+            togglePlanForm();
+            showToast('行程已新增');
+        }
+
+        function deletePlanEvent(dayIndex, eventId) {
+            showConfirm('確定要刪除此行程嗎？', () => {
+                const data = JSON.parse(localStorage.getItem('tripData'));
+                data[dayIndex].events = data[dayIndex].events.filter(evt => evt.id !== eventId);
+                localStorage.setItem('tripData', JSON.stringify(data));
+                renderPlan(data);
+                showToast('行程已刪除');
+            });
+        }
+
+        function addNewDay() {
+            const data = JSON.parse(localStorage.getItem('tripData'));
+            data.push({ day: `第${data.length + 1}天`, date: "日期", title: "點擊編輯標題", events: [] });
+            localStorage.setItem('tripData', JSON.stringify(data));
+            renderPlan(data);
+            showToast('已新增一天');
+        }
+
+        function deleteDay(index) {
+            showConfirm('確定要刪除整天的行程嗎？此動作無法復原。', () => {
+                const data = JSON.parse(localStorage.getItem('tripData'));
+                data.splice(index, 1);
+                localStorage.setItem('tripData', JSON.stringify(data));
+                renderPlan(data);
+                showToast('已刪除整天行程');
+            });
+        }
+
+        function editDayHeader(index) {
+            const data = JSON.parse(localStorage.getItem('tripData'));
+            const day = data[index];
+            showEditDayModal(day.date, day.title, (newDate, newTitle) => {
+                day.date = newDate;
+                day.title = newTitle;
+                localStorage.setItem('tripData', JSON.stringify(data));
+                renderPlan(data);
+                showToast('更新成功');
+            });
+        }
+
+        function getIconByType(type) {
+            const map = { 'transport': 'fa-solid fa-train-subway', 'food': 'fa-solid fa-utensils', 'hotel': 'fa-solid fa-bed', 'spot': 'fa-solid fa-camera', 'shopping': 'fa-solid fa-bag-shopping' };
+            return map[type] || 'fa-solid fa-circle';
+        }
+
+        // --- MODULE: GUIDE (Auto-Sync) ---
+        function initGuide() {
+            // Merge logic: TripData (Spots) + GuideData (Descriptions)
+            renderGuide();
+        }
+
+        function renderGuide() {
+            const tripData = JSON.parse(localStorage.getItem('tripData')) || defaultTripData;
+            const guideData = JSON.parse(localStorage.getItem('guideData')) || [];
+            const container = document.getElementById('guide-container');
+            
+            // 1. Get unique spots from Itinerary
+            const itinerarySpots = new Set();
+            tripData.forEach(day => {
+                day.events.forEach(evt => {
+                    if (evt.type === 'spot') itinerarySpots.add(evt.text);
+                });
+            });
+
+            // 2. Merge with manual guide items (union of names)
+            const allTitles = new Set([...itinerarySpots, ...guideData.map(g => g.title)]);
+            
+            let html = '';
+            
+            if (allTitles.size === 0) {
+                html = '<div class="text-center text-stone-400 text-sm py-10">尚無景點，請在「行程表」新增類型為「景點」的項目。</div>';
+            } else {
+                allTitles.forEach(title => {
+                    const existingGuide = guideData.find(g => g.title === title);
+                    let desc = existingGuide ? existingGuide.desc : null;
+                    let tip = existingGuide ? existingGuide.tip : null;
+                    let isAutoFilled = false;
+
+                    // If no custom guide data, check known locations
+                    if (!desc) {
+                        for (const [key, value] of Object.entries(knownLocations)) {
+                            if (title.includes(key)) {
+                                desc = value.desc;
+                                tip = value.tip;
+                                isAutoFilled = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!desc) desc = "點擊此處新增景點介紹...";
+
+                    const tipHtml = tip ? 
+                        `<div class="bg-stone-50 dark:bg-stone-900/50 p-3 rounded-lg text-xs text-stone-600 dark:text-stone-300 border border-stone-100 dark:border-stone-700 mt-4"><span class="font-bold text-muji-primary dark:text-stone-400">💡 冷知識：</span> ${tip}</div>` : '';
+                    
+                    const safeTitle = title.replace(/"/g, '&quot;');
+                    const safeDesc = desc.replace(/"/g, '&quot;');
+                    const safeTip = tip ? tip.replace(/"/g, '&quot;') : '';
+
+                    html += `
+                        <div class="bg-muji-card dark:bg-stone-800 rounded-xl overflow-hidden shadow-sm mb-6 border border-stone-100 dark:border-stone-700 transition-colors duration-300 relative group cursor-pointer" onclick="openEditGuideModal('${safeTitle}', '${existingGuide ? safeDesc : (isAutoFilled ? safeDesc : '')}', '${safeTip}')">
+                            <div class="absolute top-3 right-3 text-stone-300 p-2"><i class="fa-solid fa-pen"></i></div>
+                            <div class="h-32 bg-stone-200 dark:bg-stone-700 relative overflow-hidden flex items-center justify-center"><i class="fa-solid fa-image text-4xl text-stone-300 dark:text-stone-600"></i></div>
+                            <div class="p-5">
+                                <h3 class="font-serif text-lg font-bold text-muji-text dark:text-stone-100 mb-2">${title}</h3>
+                                <p class="text-xs text-muji-accent dark:text-stone-400 leading-relaxed text-justify ${(!existingGuide && !isAutoFilled) ? 'italic opacity-50' : ''}">${desc}</p>
+                                ${tipHtml}
+                            </div>
+                        </div>`;
+                });
+            }
+            container.innerHTML = html;
+        }
+
+        function toggleGuideForm() { document.getElementById('add-guide-form').classList.toggle('hidden'); }
+
+        function addGuideItem() {
+            const title = document.getElementById('guide-title').value;
+            const desc = document.getElementById('guide-desc').value;
+            const tip = document.getElementById('guide-tip').value;
+            if (!title || !desc) { showToast('請輸入景點名稱與介紹'); return; }
+            
+            // Update guideData
+            let guideData = JSON.parse(localStorage.getItem('guideData')) || [];
+            guideData.push({ id: Date.now(), title, desc, tip });
+            localStorage.setItem('guideData', JSON.stringify(guideData));
+            
+            renderGuide();
+            document.getElementById('guide-title').value = '';
+            document.getElementById('guide-desc').value = '';
+            document.getElementById('guide-tip').value = '';
+            toggleGuideForm();
+            showToast('導覽已新增');
+        }
+
+        // --- NAVIGATION ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.nav-btn[data-target="${tabId}"]`).classList.add('active');
+            window.scrollTo(0,0);
+            localStorage.setItem('activeTab', tabId);
+            
+            // Re-render guide when entering guide tab to ensure sync
+            if(tabId === 'guide') renderGuide();
+        }
+        function loadTabs() { const savedTab = localStorage.getItem('activeTab'); if(savedTab) switchTab(savedTab); }
+
+        // --- MODULE: WALLET ---
+        function initWallet() {
+            const savedRate = localStorage.getItem('savedExchangeRate');
+            if (savedRate) document.getElementById('exchange-rate').value = savedRate;
+            loadExpenses();
+            
+            const calcInput = document.getElementById('calc-input');
+            const rateInput = document.getElementById('exchange-rate');
+            const resultDisplay = document.getElementById('calc-result-twd');
+
+            const calculate = () => {
+                const raw = calcInput.value;
+                const rate = parseFloat(rateInput.value) || 0.22;
+                if(!raw) { resultDisplay.innerText = "0"; return; }
+                try {
+                    const sanitized = raw.replace(/[^0-9+\-*/().]/g, ''); 
+                    if (!sanitized) return;
+                    const jpyAmount = new Function('return ' + sanitized)();
+                    if(isFinite(jpyAmount)) {
+                        const twdAmount = Math.round(jpyAmount * rate);
+                        resultDisplay.innerText = twdAmount.toLocaleString();
+                    }
+                } catch (e) {}
+            };
+            calcInput.addEventListener('input', calculate);
+            rateInput.addEventListener('input', () => { calculate(); localStorage.setItem('savedExchangeRate', rateInput.value); });
+            document.getElementById('expense-photo').addEventListener('change', function(e) {
+                if(this.files && this.files[0]) {
+                    document.getElementById('photo-preview-name').innerText = "已選擇: " + this.files[0].name;
+                    document.getElementById('photo-preview-name').classList.remove('hidden');
+                }
+            });
+            fetchExchangeRate(calculate); 
+        }
+
+        async function fetchExchangeRate(callback) {
+            const statusEl = document.getElementById('rate-status');
+            if(statusEl) statusEl.innerText = "更新中...";
+            try {
+                const response = await fetch('https://api.exchangerate-api.com/v4/latest/JPY');
+                const data = await response.json();
+                if(data && data.rates && data.rates.TWD) {
+                    const rate = data.rates.TWD;
+                    document.getElementById('exchange-rate').value = rate;
+                    localStorage.setItem('savedExchangeRate', rate);
+                    if(statusEl) {
+                        const date = new Date();
+                        statusEl.innerText = `已更新 (${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')})`;
+                        setTimeout(() => { statusEl.innerText = "當前匯率 (日幣/台幣)"; }, 5000);
+                    }
+                    if(callback) callback();
+                }
+            } catch (e) { if(statusEl) statusEl.innerText = "更新失敗 (使用舊匯率)"; }
+        }
+
+        async function addExpense() {
+            const name = document.getElementById('expense-name').value;
+            const amount = parseFloat(document.getElementById('expense-amount').value);
+            const fileInput = document.getElementById('expense-photo');
+            if(!name || !amount) { showToast("請輸入名稱與金額"); return; }
+
+            let photoData = null;
+            if(fileInput.files && fileInput.files[0]) {
+                try { photoData = await processImage(fileInput.files[0]); } catch(e) { console.error(e); }
+            }
+
+            const expense = { id: Date.now(), date: new Date().toLocaleString('zh-TW', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}), name, amount, photo: photoData };
+            const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+            expenses.unshift(expense);
+            try { localStorage.setItem('expenses', JSON.stringify(expenses)); } 
+            catch (e) { showToast("空間不足！未儲存照片"); expense.photo = null; localStorage.setItem('expenses', JSON.stringify(expenses)); }
+
+            document.getElementById('expense-name').value = '';
+            document.getElementById('expense-amount').value = '';
+            document.getElementById('calc-input').value = '';
+            document.getElementById('calc-result-twd').innerText = '0';
+            fileInput.value = '';
+            document.getElementById('photo-preview-name').classList.add('hidden');
+            loadExpenses();
+            showToast('記帳成功');
+        }
+
+        function loadExpenses() {
+            const list = document.getElementById('expense-list');
+            const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+            const rate = parseFloat(document.getElementById('exchange-rate').value) || 0.22;
+            if(expenses.length === 0) { list.innerHTML = '<div class="text-center text-stone-400 text-xs py-4">尚未有記帳紀錄。</div>'; return; }
+            let html = ''; let totalJPY = 0;
+            expenses.forEach(ex => {
+                totalJPY += ex.amount;
+                const twd = Math.round(ex.amount * rate);
+                const hasPhoto = ex.photo ? `<img src="${ex.photo}" class="w-10 h-10 object-cover rounded-lg border border-stone-200 dark:border-stone-600" onclick="viewImage('${ex.photo}')">` : '<div class="w-10 h-10 bg-stone-100 dark:bg-stone-700 rounded-lg flex items-center justify-center text-stone-300 dark:text-stone-500"><i class="fa-solid fa-receipt"></i></div>';
+                html += `<div class="flex items-center gap-3 bg-white dark:bg-stone-800 p-3 rounded-xl shadow-sm border border-stone-50 dark:border-stone-700 transition-colors duration-300">
+                    ${hasPhoto}<div class="flex-1 min-w-0"><div class="text-sm font-bold text-muji-text dark:text-stone-200 truncate">${ex.name}</div><div class="text-[10px] text-stone-400 dark:text-stone-500">${ex.date}</div></div>
+                    <div class="text-right"><div class="text-sm font-bold text-muji-text dark:text-stone-200">¥${ex.amount.toLocaleString()}</div><div class="text-[10px] text-stone-400 dark:text-stone-500">≈ NT$${twd.toLocaleString()}</div></div>
+                    <button onclick="deleteExpense(${ex.id})" class="text-stone-300 hover:text-red-400 px-2"><i class="fa-solid fa-trash"></i></button></div>`;
+            });
+            list.innerHTML = `<div class="bg-stone-200 dark:bg-stone-700 p-3 rounded-lg mb-4 text-center transition-colors duration-300"><span class="text-xs text-stone-500 dark:text-stone-400">總計:</span> <span class="font-bold text-stone-700 dark:text-stone-200">¥${totalJPY.toLocaleString()}</span><span class="text-xs text-stone-400 dark:text-stone-500">(~NT$${Math.round(totalJPY * rate).toLocaleString()})</span></div>${html}`;
+        }
+
+        function deleteExpense(id) {
+            showConfirm('確定要刪除此項目嗎？', () => {
+                let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+                expenses = expenses.filter(e => e.id !== id);
+                localStorage.setItem('expenses', JSON.stringify(expenses));
+                loadExpenses();
+                showToast('已刪除');
+            });
+        }
+
+        function processImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_SIZE = 300; let width = img.width; let height = img.height;
+                        if (width > height) { if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; } } 
+                        else { if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; } }
+                        canvas.width = width; canvas.height = height;
+                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.6));
+                    };
+                    img.onerror = reject;
+                };
+                reader.onerror = reject;
+            });
+        }
+        function viewImage(base64) { const win = window.open(""); win.document.write(`<img src="${base64}" style="width:100%; height:auto; background:#333;">`); }
+
+        // --- MODULE: LISTS ---
+        function initLists() {
+            const stored = JSON.parse(localStorage.getItem('checklist'));
+            let items = stored || defaultChecklist.map(txt => ({ text: txt, checked: false }));
+            renderChecklist(items);
+        }
+        function addChecklistItem() {
+            const input = document.getElementById('new-checklist-item');
+            const text = input.value.trim();
+            if (!text) return;
+            const items = JSON.parse(localStorage.getItem('checklist')) || [];
+            items.push({ text: text, checked: false });
+            localStorage.setItem('checklist', JSON.stringify(items));
+            renderChecklist(items);
+            input.value = '';
+        }
+        function deleteChecklistItem(index) {
+            showConfirm('確定要刪除此項目嗎？', () => {
+                const items = JSON.parse(localStorage.getItem('checklist'));
+                items.splice(index, 1);
+                localStorage.setItem('checklist', JSON.stringify(items));
+                renderChecklist(items);
+            });
+        }
+        function renderChecklist(items) {
+            const container = document.getElementById('checklist-container');
+            const progress = document.getElementById('checklist-progress');
+            let html = ''; let checkedCount = 0;
+            if (items.length === 0) html = '<li class="text-center text-stone-400 text-xs py-2">清單是空的</li>';
+            else {
+                items.forEach((item, index) => {
+                    if(item.checked) checkedCount++;
+                    html += `<li class="flex items-center gap-3 bg-white dark:bg-stone-800 p-3 rounded-lg border border-stone-100 dark:border-stone-700 shadow-sm transition-colors duration-300 group">
+                        <input type="checkbox" id="check-${index}" class="muji-checkbox w-5 h-5 rounded border-stone-300 dark:border-stone-600 text-stone-600 focus:ring-stone-400 bg-white dark:bg-stone-700" ${item.checked ? 'checked' : ''} onchange="toggleCheck(${index})">
+                        <label for="check-${index}" class="text-sm text-muji-text dark:text-stone-200 flex-1 ${item.checked ? 'line-through text-stone-400 dark:text-stone-600' : ''}">${item.text}</label>
+                        <button onclick="deleteChecklistItem(${index})" class="text-stone-300 hover:text-red-400 p-1"><i class="fa-solid fa-xmark"></i></button></li>`;
+                });
+            }
+            container.innerHTML = html;
+            progress.innerText = `${checkedCount}/${items.length}`;
+            localStorage.setItem('checklist', JSON.stringify(items));
+        }
+        function toggleCheck(index) {
+            const items = JSON.parse(localStorage.getItem('checklist'));
+            items[index].checked = !items[index].checked;
+            renderChecklist(items);
+        }
+
+        // --- MODULE: MEMO ---
+        function initMemo() {
+            const area = document.getElementById('memo-area');
+            area.value = localStorage.getItem('userMemo') || '';
+            area.addEventListener('input', () => { localStorage.setItem('userMemo', area.value); });
+            parseMemoLinks(); 
+        }
+        function parseMemoLinks() {
+            const text = document.getElementById('memo-area').value;
+            const container = document.getElementById('memo-links');
+            container.innerHTML = '';
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const matches = text.match(urlRegex);
+            if(matches) {
+                matches.forEach(url => {
+                    const link = document.createElement('a');
+                    link.href = url; link.target = "_blank";
+                    link.className = "inline-flex items-center gap-1 bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 px-3 py-1 rounded-full text-xs max-w-full truncate hover:bg-stone-300 dark:hover:bg-stone-600 transition";
+                    link.innerHTML = `<i class="fa-solid fa-link text-[10px]"></i> 連結`;
+                    container.appendChild(link);
+                });
+            }
+        }
+
+        function clearAllData() {
+            showConfirm("確定要刪除所有資料（記帳、清單、備忘錄）嗎？此動作無法復原。", () => {
+                localStorage.clear();
+                location.reload();
+            });
+        }
+    </script>
+</body>
+</html>
