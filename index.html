@@ -13,7 +13,7 @@
     <meta name="theme-color" content="#1c1917">
     <link rel="apple-touch-icon" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/sprites/solid.svg"> 
     
-    <!-- Android Manifest (Embedded) -->
+    <!-- Android Manifest -->
     <link rel="manifest" href='data:application/manifest+json,%7B%22name%22%3A%22%E6%97%A5%E6%9C%AC%E6%97%85%E9%81%8A%E5%B0%8F%E5%B9%AB%E6%89%8B%22%2C%22short_name%22%3A%22%E6%97%A5%E6%9C%AC%E6%97%85%E9%81%8A%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%231c1917%22%2C%22theme_color%22%3A%22%231c1917%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F827%2F827056.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D'>
 
     <!-- Fonts & CSS -->
@@ -105,14 +105,14 @@
                     </div>
                 </div>
 
-                <button onclick="togglePlanForm()" class="w-full mb-6 border-2 border-dashed border-stone-300 dark:border-stone-700 text-stone-400 dark:text-stone-500 rounded-xl p-3 flex flex-col items-center justify-center hover:bg-stone-50 dark:hover:bg-stone-800 transition group active:scale-95">
+                <button onclick="openAddPlanModal()" class="w-full mb-6 border-2 border-dashed border-stone-300 dark:border-stone-700 text-stone-400 dark:text-stone-500 rounded-xl p-3 flex flex-col items-center justify-center hover:bg-stone-50 dark:hover:bg-stone-800 transition group active:scale-95">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-calendar-plus text-lg group-hover:scale-110 transition-transform"></i><span class="text-xs font-bold">新增行程項目</span>
                     </div>
                 </button>
 
                 <div id="add-plan-form" class="hidden bg-white dark:bg-stone-800 p-5 rounded-xl shadow-lg border border-stone-100 dark:border-stone-700 mb-6 transition-all duration-300">
-                    <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3">新增行程</h3>
+                    <h3 id="plan-form-title" class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3">新增行程</h3>
                     <div class="space-y-3">
                         <div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">選擇日期</label><select id="plan-day-select" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2"></select></div>
                         <div class="flex gap-2">
@@ -122,7 +122,7 @@
                         <div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">行程內容</label><input type="text" id="plan-text" placeholder="例：前往淺草寺參拜" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2"></div>
                         <div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">Google Maps 連結 (選填)</label><input type="text" id="plan-link" placeholder="貼上地圖網址" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2"></div>
                         <div class="flex items-center gap-2"><input type="checkbox" id="plan-important" class="muji-checkbox w-4 h-4 rounded text-amber-500 focus:ring-amber-500"><label for="plan-important" class="text-xs text-stone-600 dark:text-stone-300">標記為重要行程</label></div>
-                        <div class="flex gap-2 pt-2"><button onclick="togglePlanForm()" class="flex-1 bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 rounded-lg text-xs py-2">取消</button><button onclick="addPlanEvent()" class="flex-1 bg-stone-700 dark:bg-stone-600 text-white rounded-lg text-xs font-bold py-2">新增</button></div>
+                        <div class="flex gap-2 pt-2"><button onclick="togglePlanForm()" class="flex-1 bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 rounded-lg text-xs py-2">取消</button><button onclick="savePlanEvent()" class="flex-1 bg-stone-700 dark:bg-stone-600 text-white rounded-lg text-xs font-bold py-2">儲存</button></div>
                     </div>
                 </div>
 
@@ -201,8 +201,13 @@
         import { getFirestore, doc, onSnapshot, setDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 
-        // --- ROBUST FIREBASE INIT (Paste Config Here) ---
-        
+        // --- ROBUST FIREBASE INIT ---
+        let app, auth, db, appId, firebaseConfig;
+        let isOfflineOnly = false;
+        let currentUser = null;
+        let currentTripId = localStorage.getItem('currentTripId') || 'TRIP-' + Math.floor(1000 + Math.random() * 9000);
+        let unsubscribeSnapshot = null;
+
         // ↓↓↓ 請將您的 Firebase 設定貼在下方 ↓↓↓
         const myFirebaseConfig = {
             apiKey: "AIzaSyByoGa9zSiiOMMSUehtJxY6NfbAZ-p2id0",
@@ -215,29 +220,21 @@
         };
         // ↑↑↑
 
-        let app, auth, db, appId, firebaseConfig;
-        let isOfflineOnly = false;
-        let currentUser = null;
-        let currentTripId = localStorage.getItem('currentTripId') || 'TRIP-' + Math.floor(1000 + Math.random() * 9000);
-        let unsubscribeSnapshot = null;
-
         try {
             if (Object.keys(myFirebaseConfig).length > 0) {
-                // User has pasted config
                 firebaseConfig = myFirebaseConfig;
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
                 appId = 'japan-trip-helper';
             } else if (typeof __firebase_config !== 'undefined') {
-                // Cloud environment backup
                 firebaseConfig = JSON.parse(__firebase_config);
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
                 appId = typeof __app_id !== 'undefined' ? __app_id : 'japan-trip-helper';
             } else {
-                throw new Error("No config found");
+                throw new Error("Local file detected");
             }
         } catch (e) {
             console.warn("Running in OFFLINE MODE.");
@@ -247,7 +244,7 @@
 
         // --- DATA MODELS ---
         let sharedData = {
-            tripData: [{ day: "第一天", date: "請點擊編輯日期", title: "點擊編輯標題", events: [] }],
+            tripData: [{ day: "第一天", date: "1/11", title: "抵達東京", events: [] }],
             guideData: [],
             flightData: { depAirport: "TPE", depTime: "02:30", arrAirport: "NRT", arrTime: "06:35", flightNum: "捷星 GK12" },
             appSettings: { title: "東京旅遊", date: "2026.01.11 - 01.18" }
@@ -264,6 +261,8 @@
         }
 
         const knownLocations = { "淺草寺": { desc: "東京都內最古老的寺廟...", tip: "求籤如果是「凶」，請將籤詩綁在架子上化解。" }, "雷門": { desc: "淺草寺的表參道入口...", tip: "燈籠底部有龍的雕刻。" } };
+
+        let editingEventState = null; // Track editing state { dayIndex, eventId }
 
         // --- AUTH & SYNC ---
         const initAuth = async () => {
@@ -302,7 +301,7 @@
                 } else {
                     saveShared(); statusEl.innerText = "新旅程";
                 }
-            }, (error) => { console.error("Sync Error:", error); isOfflineOnly = true; document.getElementById('sync-status').innerText = "離線模式"; });
+            }, (error) => { console.error("Sync Error:", error); isOfflineOnly = true; document.getElementById('sync-status').innerText = "離線模式 (權限不足)"; });
         }
 
         function saveLocal() { localStorage.setItem('localUserData', JSON.stringify(localData)); }
@@ -311,7 +310,7 @@
             if (isOfflineOnly || !currentUser) return;
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'trips', currentTripId);
             try { await setDoc(docRef, sharedData); document.getElementById('sync-status').innerText = "儲存中..."; setTimeout(() => document.getElementById('sync-status').innerText = "已同步", 500); } 
-            catch (e) { console.error("Save Error", e); if(e.code === 'permission-denied') { isOfflineOnly = true; document.getElementById('sync-status').innerText = "離線模式"; } }
+            catch (e) { console.error("Save Error", e); if(e.code === 'permission-denied') { isOfflineOnly = true; document.getElementById('sync-status').innerText = "離線模式 (儲存失敗)"; } }
         }
 
         // --- EXPORTS ---
@@ -327,21 +326,75 @@
         window.toggleGuideForm = () => document.getElementById('add-guide-form').classList.toggle('hidden');
         window.closeModal = (id) => document.getElementById(id).classList.remove('active');
         
-        window.addPlanEvent = () => {
-            const dayIndex = document.getElementById('plan-day-select').value;
+        window.openAddPlanModal = () => {
+            editingEventState = null;
+            document.getElementById('plan-form-title').innerText = "新增行程";
+            document.getElementById('plan-text').value = ''; 
+            document.getElementById('plan-link').value = '';
+            document.getElementById('plan-time').value = '';
+            document.getElementById('plan-important').checked = false;
+            document.getElementById('add-plan-form').classList.remove('hidden');
+        };
+
+        window.editPlanEvent = (dayIndex, eventId) => {
+            // Find event
+            const day = sharedData.tripData[dayIndex];
+            const evt = day.events.find(e => String(e.id) === String(eventId));
+            if (!evt) return;
+
+            editingEventState = { dayIndex, eventId };
+            
+            // Populate form
+            document.getElementById('plan-form-title').innerText = "編輯行程";
+            document.getElementById('plan-day-select').value = dayIndex;
+            document.getElementById('plan-time').value = evt.time;
+            document.getElementById('plan-type').value = evt.type;
+            document.getElementById('plan-text').value = evt.text;
+            document.getElementById('plan-link').value = evt.link || '';
+            document.getElementById('plan-important').checked = evt.important || false;
+            
+            document.getElementById('add-plan-form').classList.remove('hidden');
+        };
+
+        window.savePlanEvent = () => {
+            const dayIndex = parseInt(document.getElementById('plan-day-select').value);
             const time = document.getElementById('plan-time').value;
             const type = document.getElementById('plan-type').value;
             const text = document.getElementById('plan-text').value;
             const link = document.getElementById('plan-link').value;
             const important = document.getElementById('plan-important').checked;
+
             if (!time || !text) { showToast('請輸入內容'); return; }
-            sharedData.tripData[dayIndex].events.push({ id: Date.now() + Math.random(), time, text, type, link, important });
+
+            if (editingEventState) {
+                // Edit Mode
+                // Remove from old location (might be different day if user changed day select)
+                const oldDayIdx = editingEventState.dayIndex;
+                const oldDay = sharedData.tripData[oldDayIdx];
+                const evtId = editingEventState.eventId;
+                
+                // Remove old event
+                oldDay.events = oldDay.events.filter(e => String(e.id) !== String(evtId));
+                
+                // Add new event (keep ID)
+                sharedData.tripData[dayIndex].events.push({ id: evtId, time, text, type, link, important });
+                
+                showToast('行程已更新');
+            } else {
+                // Add Mode
+                sharedData.tripData[dayIndex].events.push({ id: Date.now() + Math.random(), time, text, type, link, important });
+                showToast('行程已新增');
+            }
+
             saveShared();
-            document.getElementById('plan-text').value = ''; document.getElementById('plan-link').value = ''; window.togglePlanForm(); showToast('已新增');
+            document.getElementById('add-plan-form').classList.add('hidden');
             renderPlan(); 
         };
+
+        // Renamed from addPlanEvent to avoid confusion, though button calls savePlanEvent now
+        
         window.deletePlanEvent = (dIdx, eId) => { showConfirm('刪除？', () => { sharedData.tripData[dIdx].events = sharedData.tripData[dIdx].events.filter(e => String(e.id) !== String(eId)); saveShared(); renderPlan(); }); };
-        window.addNewDay = () => { sharedData.tripData.push({ day: `第${sharedData.tripData.length+1}天`, date: "日期", title: "點擊編輯", events: [] }); saveShared(); renderPlan(); };
+        window.addNewDay = () => { sharedData.tripData.push({ day: `第${sharedData.tripData.length+1}天`, date: "日期待定", title: "自由活動", events: [] }); saveShared(); renderPlan(); };
         window.deleteDay = (idx) => { showConfirm('刪除整天？', () => { sharedData.tripData.splice(idx, 1); saveShared(); renderPlan(); }); };
         window.editDayHeader = (idx) => { const d = sharedData.tripData[idx]; showEditDayModal(d.date, d.title, (nD, nT) => { d.date = nD; d.title = nT; saveShared(); renderPlan(); }); };
 
@@ -409,7 +462,7 @@
             const container = document.getElementById('itinerary-container'); const daySelect = document.getElementById('plan-day-select');
             let html = ''; let selectHtml = '';
             // Add day if empty
-            if(!sharedData.tripData || sharedData.tripData.length === 0) { sharedData.tripData = [{ day: "第一天", date: "日期", title: "點擊編輯", events: [] }]; }
+            if(!sharedData.tripData || sharedData.tripData.length === 0) { sharedData.tripData = [{ day: "第一天", date: "1/11", title: "抵達東京", events: [] }]; }
             sharedData.tripData.forEach((day, index) => {
                 selectHtml += `<option value="${index}">${day.day} (${day.date})</option>`;
                 let eventsHtml = '';
@@ -418,7 +471,8 @@
                     const highlightClass = evt.important ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-900/50' : 'bg-white border-transparent dark:bg-stone-800 dark:border-stone-700';
                     const timeColor = evt.important ? 'text-amber-600 dark:text-amber-500 font-bold' : 'text-muji-text dark:text-stone-400';
                     let actionBtn = evt.link ? `<a href="${evt.link}" target="_blank" class="ml-2 text-xs bg-stone-100 dark:bg-stone-700 px-2 py-0.5 rounded text-stone-500 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-600"><i class="fa-solid fa-map-location-dot"></i> 地圖</a>` : '';
-                    eventsHtml += `<div class="flex gap-4 relative group"><div class="flex flex-col items-center"><div class="w-2 h-2 rounded-full bg-stone-300 dark:bg-stone-600 mt-2"></div><div class="w-0.5 flex-1 bg-stone-200 dark:bg-stone-700 my-1"></div></div><div class="flex-1 pb-6 relative"><button onclick="deletePlanEvent(${index}, '${evt.id}')" class="absolute top-0 right-0 z-10 text-stone-300 hover:text-red-400 p-2"><i class="fa-solid fa-xmark"></i></button><div class="text-xs ${timeColor} mb-0.5">${evt.time}</div><div class="p-3 rounded-lg border shadow-sm ${highlightClass} transition-colors duration-300"><div class="flex items-start gap-2"><i class="${icon} text-stone-400 dark:text-stone-500 mt-1 text-xs"></i><div class="text-sm text-muji-text dark:text-stone-200 font-medium leading-tight pr-6">${evt.text}${actionBtn}</div></div></div></div></div>`;
+                    // Added EDIT button next to DELETE
+                    eventsHtml += `<div class="flex gap-4 relative group"><div class="flex flex-col items-center"><div class="w-2 h-2 rounded-full bg-stone-300 dark:bg-stone-600 mt-2"></div><div class="w-0.5 flex-1 bg-stone-200 dark:bg-stone-700 my-1"></div></div><div class="flex-1 pb-6 relative"><div class="absolute top-0 right-0 z-10 flex gap-1"><button onclick="editPlanEvent(${index}, '${evt.id}')" class="text-stone-300 hover:text-stone-500 p-2"><i class="fa-solid fa-pen"></i></button><button onclick="deletePlanEvent(${index}, '${evt.id}')" class="text-stone-300 hover:text-red-400 p-2"><i class="fa-solid fa-xmark"></i></button></div><div class="text-xs ${timeColor} mb-0.5">${evt.time}</div><div class="p-3 rounded-lg border shadow-sm ${highlightClass} transition-colors duration-300"><div class="flex items-start gap-2"><i class="${icon} text-stone-400 dark:text-stone-500 mt-1 text-xs"></i><div class="text-sm text-muji-text dark:text-stone-200 font-medium leading-tight pr-6">${evt.text}${actionBtn}</div></div></div></div></div>`;
                 });
                 html += `<div class="relative group"><div class="sticky top-16 z-10 bg-[#f4f4f0]/95 dark:bg-[#1c1917]/95 py-2 mb-2 border-b border-stone-200 dark:border-stone-800 backdrop-blur-sm transition-colors duration-300 flex justify-between items-end"><h2 class="font-serif font-bold text-lg text-muji-text dark:text-stone-100 flex items-baseline gap-2 cursor-pointer" onclick="editDayHeader(${index})">${day.date} <span class="text-sm font-sans text-muji-accent dark:text-stone-500 font-normal">${day.day} - ${day.title}</span></h2><div class="flex gap-2"><button onclick="editDayHeader(${index})" class="text-stone-300 hover:text-stone-500 dark:hover:text-stone-300 text-xs p-2 bg-stone-100 dark:bg-stone-800 rounded-full"><i class="fa-solid fa-pen"></i></button><button onclick="deleteDay(${index})" class="text-stone-300 hover:text-red-400 text-xs p-2 bg-stone-100 dark:bg-stone-800 rounded-full"><i class="fa-solid fa-trash"></i></button></div></div><div class="pl-2">${eventsHtml}</div></div>`;
             });
