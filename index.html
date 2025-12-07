@@ -93,8 +93,7 @@
         <!-- CONTENT: PLAN -->
         <main class="p-4">
             <div id="tab-plan" class="tab-content active">
-                
-                <!-- Flight Card (Round Trip) -->
+                <!-- Flight Card -->
                 <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6 transition-colors duration-300 relative group">
                     <button onclick="openFlightModal()" class="absolute top-3 right-3 text-stone-300 hover:text-stone-500 dark:hover:text-stone-300 p-2"><i class="fa-solid fa-pen text-xs"></i></button>
                     <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3 uppercase tracking-wide border-b border-stone-100 dark:border-stone-700 pb-2">航班資訊</h3>
@@ -103,18 +102,9 @@
                     <div class="mb-4">
                         <div class="text-[10px] text-stone-400 uppercase mb-1 font-bold tracking-widest"><i class="fa-solid fa-plane-departure mr-1"></i>去程</div>
                         <div class="flex justify-between items-center">
-                            <div class="text-center w-1/4">
-                                <div id="disp-out-dep" class="text-xl font-serif font-bold text-muji-text dark:text-stone-100">TPE</div>
-                                <div id="disp-out-dep-time" class="text-xs text-muji-accent dark:text-stone-400">02:30</div>
-                            </div>
-                            <div class="flex-1 px-2 text-center">
-                                <div class="h-[1px] bg-stone-300 dark:bg-stone-600 w-full mt-1"></div>
-                                <div id="disp-out-flight" class="text-[10px] text-muji-accent dark:text-stone-500 mt-1">捷星 GK12</div>
-                            </div>
-                            <div class="text-center w-1/4">
-                                <div id="disp-out-arr" class="text-xl font-serif font-bold text-muji-text dark:text-stone-100">NRT</div>
-                                <div id="disp-out-arr-time" class="text-xs text-muji-accent dark:text-stone-400">06:35</div>
-                            </div>
+                            <div class="text-center w-1/4"><div id="disp-out-dep" class="text-xl font-serif font-bold text-muji-text dark:text-stone-100">TPE</div><div id="disp-out-dep-time" class="text-xs text-muji-accent dark:text-stone-400">02:30</div></div>
+                            <div class="flex-1 px-2 text-center"><div class="h-[1px] bg-stone-300 dark:bg-stone-600 w-full mt-1"></div><div id="disp-out-flight" class="text-[10px] text-muji-accent dark:text-stone-500 mt-1">捷星 GK12</div></div>
+                            <div class="text-center w-1/4"><div id="disp-out-arr" class="text-xl font-serif font-bold text-muji-text dark:text-stone-100">NRT</div><div id="disp-out-arr-time" class="text-xs text-muji-accent dark:text-stone-400">06:35</div></div>
                         </div>
                     </div>
 
@@ -122,26 +112,15 @@
                     <div>
                         <div class="text-[10px] text-stone-400 uppercase mb-1 font-bold tracking-widest"><i class="fa-solid fa-plane-arrival mr-1"></i>回程</div>
                         <div class="flex justify-between items-center">
-                            <div class="text-center w-1/4">
-                                <div id="disp-in-dep" class="text-xl font-serif font-bold text-muji-text dark:text-stone-100">NRT</div>
-                                <div id="disp-in-dep-time" class="text-xs text-muji-accent dark:text-stone-400">--:--</div>
-                            </div>
-                            <div class="flex-1 px-2 text-center">
-                                <div class="h-[1px] bg-stone-300 dark:bg-stone-600 w-full mt-1"></div>
-                                <div id="disp-in-flight" class="text-[10px] text-muji-accent dark:text-stone-500 mt-1">--</div>
-                            </div>
-                            <div class="text-center w-1/4">
-                                <div id="disp-in-arr" class="text-xl font-serif font-bold text-muji-text dark:text-stone-100">TPE</div>
-                                <div id="disp-in-arr-time" class="text-xs text-muji-accent dark:text-stone-400">--:--</div>
-                            </div>
+                            <div class="text-center w-1/4"><div id="disp-in-dep" class="text-xl font-serif font-bold text-muji-text dark:text-stone-100">NRT</div><div id="disp-in-dep-time" class="text-xs text-muji-accent dark:text-stone-400">--:--</div></div>
+                            <div class="flex-1 px-2 text-center"><div class="h-[1px] bg-stone-300 dark:bg-stone-600 w-full mt-1"></div><div id="disp-in-flight" class="text-[10px] text-muji-accent dark:text-stone-500 mt-1">--</div></div>
+                            <div class="text-center w-1/4"><div id="disp-in-arr" class="text-xl font-serif font-bold text-muji-text dark:text-stone-100">TPE</div><div id="disp-in-arr-time" class="text-xs text-muji-accent dark:text-stone-400">--:--</div></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Day Selector -->
-                <div id="day-selector" class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar items-center">
-                    <!-- JS will populate this -->
-                </div>
+                <div id="day-selector" class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar items-center"></div>
 
                 <!-- ADD PLAN FORM (Hidden initially) -->
                 <div id="add-plan-form" class="hidden bg-white dark:bg-stone-800 p-5 rounded-xl shadow-lg border border-stone-100 dark:border-stone-700 mb-6 transition-all duration-300 scroll-mt-20">
@@ -160,9 +139,7 @@
                 </div>
 
                 <div id="itinerary-container" class="space-y-6"></div>
-                <div class="text-center mt-6 mb-8">
-                    <!-- Add day button is inside the day selector now -->
-                </div>
+                <div class="text-center mt-6 mb-8"></div>
             </div>
 
             <!-- 2. GUIDE -->
@@ -253,7 +230,16 @@
 
         <div id="confirm-modal" class="modal-overlay"><div class="modal-box"><h3 class="font-bold text-lg mb-2 dark:text-white">確認</h3><p id="confirm-message" class="text-sm text-gray-500 mb-6 dark:text-gray-400"></p><div class="flex justify-end gap-3"><button onclick="closeModal('confirm-modal')" class="px-4 py-2 text-sm text-gray-500">取消</button><button id="confirm-btn" class="px-4 py-2 text-sm bg-stone-700 text-white rounded">確定</button></div></div></div>
         <div id="edit-day-modal" class="modal-overlay"><div class="modal-box"><h3 class="font-bold text-lg mb-4 dark:text-white">編輯標題</h3><div class="space-y-4 mb-6"><input type="text" id="edit-day-date" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded"><input type="text" id="edit-day-title" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded"></div><div class="flex justify-end gap-3"><button onclick="closeModal('edit-day-modal')" class="text-sm text-gray-500">取消</button><button id="save-day-btn" class="text-sm bg-stone-700 text-white px-4 py-2 rounded">儲存</button></div></div></div>
-        <div id="edit-flight-modal" class="modal-overlay"><div class="modal-box"><h3 class="font-bold text-lg mb-4 dark:text-white">編輯航班</h3><div class="space-y-3 mb-6"><div class="flex gap-2"><input type="text" id="edit-dep-airport" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"><input type="time" id="edit-dep-time" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div><div class="flex gap-2"><input type="text" id="edit-arr-airport" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"><input type="time" id="edit-arr-time" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div><input type="text" id="edit-flight-num" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div><div class="flex justify-end gap-3"><button onclick="closeModal('edit-flight-modal')" class="text-sm text-gray-500">取消</button><button onclick="saveFlightInfo()" class="text-sm bg-stone-700 text-white px-4 py-2 rounded">儲存</button></div></div></div>
+        <div id="edit-flight-modal" class="modal-overlay"><div class="modal-box"><h3 class="font-bold text-lg mb-4 dark:text-white">編輯航班</h3><div class="space-y-3 mb-6">
+            <div class="text-[10px] text-gray-500">去程 (Dep/Arr/No.)</div>
+            <div class="flex gap-2"><input type="text" id="edit-out-dep" class="w-1/3 bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"><input type="time" id="edit-out-dep-time" class="w-2/3 bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div>
+            <div class="flex gap-2"><input type="text" id="edit-out-arr" class="w-1/3 bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"><input type="time" id="edit-out-arr-time" class="w-2/3 bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div>
+            <input type="text" id="edit-out-num" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm">
+            <div class="text-[10px] text-gray-500 mt-2">回程 (Dep/Arr/No.)</div>
+            <div class="flex gap-2"><input type="text" id="edit-in-dep" class="w-1/3 bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"><input type="time" id="edit-in-dep-time" class="w-2/3 bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div>
+            <div class="flex gap-2"><input type="text" id="edit-in-arr" class="w-1/3 bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"><input type="time" id="edit-in-arr-time" class="w-2/3 bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div>
+            <input type="text" id="edit-in-num" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm">
+        </div><div class="flex justify-end gap-3"><button onclick="closeModal('edit-flight-modal')" class="text-sm text-gray-500">取消</button><button onclick="saveFlightInfo()" class="text-sm bg-stone-700 text-white px-4 py-2 rounded">儲存</button></div></div></div>
         
         <!-- PLAN EDIT MODAL (New) -->
         <div id="edit-plan-modal" class="modal-overlay"><div class="modal-box"><h3 class="font-bold text-lg mb-4 dark:text-white">編輯行程</h3><div class="space-y-3 mb-6"><div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">日期 (可移動)</label><select id="edit-plan-day" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></select></div><div class="flex gap-2"><div class="w-1/3"><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">時間</label><input type="time" id="edit-plan-time" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div><div class="w-2/3"><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">類型</label><select id="edit-plan-type" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"><option value="spot">景點</option><option value="food">美食</option><option value="transport">交通</option><option value="shopping">購物</option><option value="hotel">住宿</option></select></div></div><div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">內容</label><input type="text" id="edit-plan-text" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div><div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">連結</label><input type="text" id="edit-plan-link" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div><div class="flex items-center gap-2"><input type="checkbox" id="edit-plan-important" class="muji-checkbox w-4 h-4"><label for="edit-plan-important" class="text-xs text-stone-600 dark:text-stone-300">重要</label></div></div><div class="flex justify-end gap-3"><button onclick="closeModal('edit-plan-modal')" class="text-sm text-gray-500">取消</button><button onclick="saveEditedPlanEvent()" class="text-sm bg-stone-700 text-white px-4 py-2 rounded">儲存</button></div></div></div>
@@ -306,7 +292,7 @@
         } catch (e) {
             console.warn("Running in OFFLINE MODE.");
             isOfflineOnly = true;
-            document.getElementById('sync-status').innerText = "離線模式";
+            if(document.getElementById('sync-status')) document.getElementById('sync-status').innerText = "離線模式";
         }
 
         // --- DATA MODELS ---
@@ -384,7 +370,226 @@
             catch (e) { console.error("Save Error", e); if(e.code === 'permission-denied') { isOfflineOnly = true; document.getElementById('sync-status').innerText = "離線模式 (儲存失敗)"; } }
         }
 
-        // --- EXPORTS ---
+        // --- HELPER FUNCTIONS (Missing in original) ---
+        window.showToast = (msg) => {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 2500);
+        };
+
+        window.showConfirm = (msg, callback) => {
+            document.getElementById('confirm-message').innerText = msg;
+            const modal = document.getElementById('confirm-modal');
+            modal.classList.add('active');
+            const btn = document.getElementById('confirm-btn');
+            btn.onclick = () => {
+                callback();
+                modal.classList.remove('active');
+            };
+        };
+        
+        window.showEditDayModal = (currentDate, currentTitle, callback) => {
+            document.getElementById('edit-day-date').value = currentDate;
+            document.getElementById('edit-day-title').value = currentTitle;
+            const modal = document.getElementById('edit-day-modal');
+            modal.classList.add('active');
+            document.getElementById('save-day-btn').onclick = () => {
+                callback(document.getElementById('edit-day-date').value, document.getElementById('edit-day-title').value);
+                modal.classList.remove('active');
+            }
+        };
+
+        // --- RENDER LOGIC (Missing in original) ---
+        function renderPlan() {
+            // Render Day Selector
+            const daySelector = document.getElementById('day-selector');
+            daySelector.innerHTML = '';
+            sharedData.tripData.forEach((d, i) => {
+                const btn = document.createElement('button');
+                btn.className = `flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition ${i === currentPlanDayIndex ? 'bg-stone-700 text-white dark:bg-stone-100 dark:text-stone-800' : 'bg-white dark:bg-stone-800 text-stone-500 dark:text-stone-400 border border-stone-200 dark:border-stone-700'}`;
+                btn.innerText = d.day;
+                btn.onclick = () => window.switchPlanDay(i);
+                daySelector.appendChild(btn);
+            });
+            const addBtn = document.createElement('button');
+            addBtn.className = "flex-shrink-0 px-3 py-2 rounded-full text-xs font-bold bg-stone-200 text-stone-600 dark:bg-stone-700 dark:text-stone-300";
+            addBtn.innerHTML = '<i class="fa-solid fa-plus"></i>';
+            addBtn.onclick = window.addNewDay;
+            daySelector.appendChild(addBtn);
+
+            // Populate Day Select in Add Form & Edit Modal
+            const dayOptions = sharedData.tripData.map((d, i) => `<option value="${i}">${d.day} - ${d.date}</option>`).join('');
+            document.getElementById('plan-day-select').innerHTML = dayOptions;
+            document.getElementById('edit-plan-day').innerHTML = dayOptions;
+
+            // Render Itinerary
+            const container = document.getElementById('itinerary-container');
+            container.innerHTML = '';
+            
+            if (sharedData.tripData.length > 0) {
+                const day = sharedData.tripData[currentPlanDayIndex];
+                
+                // Header
+                const headerHtml = `
+                    <div class="flex justify-between items-end mb-4 border-l-4 border-stone-400 pl-3">
+                        <div>
+                            <h2 class="text-2xl font-serif font-bold text-muji-text dark:text-stone-100">${day.date}</h2>
+                            <p class="text-sm text-stone-500 dark:text-stone-400">${day.title}</p>
+                        </div>
+                        <div class="flex gap-2">
+                             <button onclick="editDayHeader(${currentPlanDayIndex})" class="text-stone-300 hover:text-stone-500 dark:hover:text-stone-200"><i class="fa-solid fa-pen"></i></button>
+                             <button onclick="exportDayImage()" class="text-stone-300 hover:text-stone-500 dark:hover:text-stone-200"><i class="fa-solid fa-image"></i></button>
+                             <button onclick="deleteDay(${currentPlanDayIndex})" class="text-stone-300 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML = headerHtml;
+
+                // Events
+                const events = day.events.sort((a,b) => a.time.localeCompare(b.time));
+                if (events.length === 0) {
+                    container.innerHTML += `<div onclick="openAddPlanModal()" class="border-2 border-dashed border-stone-300 dark:border-stone-700 rounded-xl p-8 text-center text-stone-400 cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-800 transition"><i class="fa-regular fa-calendar-plus text-2xl mb-2"></i><div class="text-xs">點擊新增行程</div></div>`;
+                } else {
+                    let html = '<div class="relative border-l border-stone-200 dark:border-stone-700 ml-3 space-y-6 pb-4">';
+                    events.forEach(evt => {
+                        const iconMap = { spot: 'fa-map-pin', food: 'fa-utensils', transport: 'fa-train-subway', shopping: 'fa-bag-shopping', hotel: 'fa-bed' };
+                        const icon = iconMap[evt.type] || 'fa-circle';
+                        const importantClass = evt.important ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20' : 'border-stone-100 dark:border-stone-700 bg-white dark:bg-stone-800';
+                        
+                        html += `
+                            <div class="relative pl-6 group">
+                                <div class="absolute -left-[9px] top-1 bg-muji-base dark:bg-stone-900 p-1 rounded-full text-stone-400 text-xs"><i class="fa-solid ${icon}"></i></div>
+                                <div class="flex items-start justify-between ${importantClass} p-3 rounded-lg shadow-sm border transition-all active:scale-[0.99]" onclick="editPlanEvent(${currentPlanDayIndex}, '${evt.id}')">
+                                    <div class="flex-1">
+                                        <div class="flex items-baseline gap-2 mb-1">
+                                            <span class="font-mono font-bold text-muji-primary dark:text-stone-400 text-lg">${evt.time}</span>
+                                            ${evt.link ? `<a href="${evt.link}" target="_blank" onclick="event.stopPropagation()" class="text-stone-300 hover:text-blue-400"><i class="fa-solid fa-location-dot"></i></a>` : ''}
+                                        </div>
+                                        <div class="text-muji-text dark:text-stone-200 font-medium">${evt.text}</div>
+                                    </div>
+                                    <button onclick="event.stopPropagation(); deletePlanEvent(${currentPlanDayIndex}, '${evt.id}')" class="text-stone-200 hover:text-red-400 p-2"><i class="fa-solid fa-xmark"></i></button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    html += `<button onclick="openAddPlanModal()" class="w-full py-3 text-stone-400 text-xs font-bold border-t border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition"><i class="fa-solid fa-plus mr-1"></i> 新增行程</button>`;
+                    container.innerHTML += html;
+                }
+            } else {
+                container.innerHTML = '<div class="text-center py-10 text-stone-400">尚無行程，請點擊上方 + 新增天數</div>';
+            }
+        }
+
+        function renderGuide() {
+            const container = document.getElementById('guide-container');
+            container.innerHTML = '';
+            
+            // Auto-generate from trip data spots
+            const autoSpots = new Set();
+            sharedData.tripData.forEach(day => {
+                day.events.forEach(e => {
+                    if (e.type === 'spot') autoSpots.add(e.text);
+                });
+            });
+
+            // Combine manual guide data
+            const manualGuides = sharedData.guideData || [];
+            
+            let html = '';
+            // Render manual guides first
+            manualGuides.forEach(g => {
+                html += `
+                    <div class="bg-white dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-4" onclick="openEditGuideModal('${g.title}', '${g.desc}', '${g.tip || ''}')">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-lg text-muji-text dark:text-stone-200">${g.title}</h3>
+                            <span class="text-[10px] bg-stone-100 dark:bg-stone-700 text-stone-500 px-2 py-0.5 rounded">手動</span>
+                        </div>
+                        <p class="text-sm text-stone-600 dark:text-stone-400 mb-3 line-clamp-3">${g.desc}</p>
+                        ${g.tip ? `<div class="bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded text-xs text-stone-600 dark:text-stone-300"><i class="fa-regular fa-lightbulb text-yellow-500 mr-1"></i>${g.tip}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            // Render auto spots if not already covered
+            autoSpots.forEach(spotName => {
+                if (manualGuides.some(g => g.title === spotName)) return; // Skip if manually added
+                const info = knownLocations[spotName] || { desc: "尚無詳細介紹", tip: "" };
+                html += `
+                    <div class="bg-muji-base dark:bg-stone-900 p-5 rounded-xl border border-stone-200 dark:border-stone-700 mb-4 opacity-80">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-lg text-muji-text dark:text-stone-200">${spotName}</h3>
+                            <span class="text-[10px] border border-stone-300 text-stone-400 px-2 py-0.5 rounded">自動偵測</span>
+                        </div>
+                        <p class="text-sm text-stone-600 dark:text-stone-400 mb-3">${info.desc}</p>
+                        <button onclick="openEditGuideModal('${spotName}', '${info.desc}', '')" class="text-xs text-blue-500 underline">編輯 / 新增詳情</button>
+                    </div>
+                `;
+            });
+
+            if (!html) html = '<div class="text-center text-stone-400 text-xs py-10">尚無導覽資料</div>';
+            container.innerHTML = html;
+        }
+        
+        function renderChecklist() {
+            const list = document.getElementById('checklist-container');
+            const items = localData.checklist || [];
+            const done = items.filter(i => i.checked).length;
+            document.getElementById('checklist-progress').innerText = `${done}/${items.length}`;
+            
+            list.innerHTML = items.map((item, i) => `
+                <li class="flex items-center justify-between group">
+                    <label class="flex items-center gap-3 cursor-pointer flex-1">
+                        <input type="checkbox" class="muji-checkbox w-5 h-5 rounded text-stone-600 focus:ring-stone-500 border-stone-300" ${item.checked ? 'checked' : ''} onchange="toggleCheck(${i})">
+                        <span class="text-sm ${item.checked ? 'text-stone-400 line-through' : 'text-stone-700 dark:text-stone-200'}">${item.text}</span>
+                    </label>
+                    <button onclick="deleteChecklistItem(${i})" class="text-stone-200 hover:text-red-400 px-2"><i class="fa-solid fa-xmark"></i></button>
+                </li>
+            `).join('');
+        }
+
+        function initFlightInfo() {
+            const d = sharedData.flightData || {};
+            const out = d.outbound || {};
+            const inc = d.inbound || {};
+            
+            // Render View
+            document.getElementById('disp-out-dep').innerText = out.dep || 'TPE';
+            document.getElementById('disp-out-dep-time').innerText = out.depTime || '--:--';
+            document.getElementById('disp-out-arr').innerText = out.arr || 'NRT';
+            document.getElementById('disp-out-arr-time').innerText = out.arrTime || '--:--';
+            document.getElementById('disp-out-flight').innerText = out.num || '--';
+
+            document.getElementById('disp-in-dep').innerText = inc.dep || 'NRT';
+            document.getElementById('disp-in-dep-time').innerText = inc.depTime || '--:--';
+            document.getElementById('disp-in-arr').innerText = inc.arr || 'TPE';
+            document.getElementById('disp-in-arr-time').innerText = inc.arrTime || '--:--';
+            document.getElementById('disp-in-flight').innerText = inc.num || '--';
+            
+            // Populate Edit Form
+            document.getElementById('edit-out-dep').value = out.dep || 'TPE';
+            document.getElementById('edit-out-dep-time').value = out.depTime || '';
+            document.getElementById('edit-out-arr').value = out.arr || 'NRT';
+            document.getElementById('edit-out-arr-time').value = out.arrTime || '';
+            document.getElementById('edit-out-num').value = out.num || '';
+            
+            document.getElementById('edit-in-dep').value = inc.dep || 'NRT';
+            document.getElementById('edit-in-dep-time').value = inc.depTime || '';
+            document.getElementById('edit-in-arr').value = inc.arr || 'TPE';
+            document.getElementById('edit-in-arr-time').value = inc.arrTime || '';
+            document.getElementById('edit-in-num').value = inc.num || '';
+        }
+        
+        function renderAppSettings() {
+            const s = sharedData.appSettings || {};
+            document.getElementById('app-title').innerText = s.title || "日本旅遊";
+            document.getElementById('app-date').innerText = s.date || "";
+            document.getElementById('setting-title').value = s.title || "";
+            document.getElementById('setting-date').value = s.date || "";
+        }
+
+        // --- EXPORTS (Bind functions to window) ---
         window.copyTripId = () => { navigator.clipboard.writeText(currentTripId).then(() => showToast("代碼已複製")); };
         window.joinTrip = () => {
             if(isOfflineOnly) { showToast("離線模式無法加入旅程"); return; }
@@ -424,22 +629,14 @@
             if (!evt) return;
             editingEventState = { dayIndex, eventId };
             
-            // Populate Modal Options
-            const select = document.getElementById('edit-plan-day');
-            select.innerHTML = '';
-            sharedData.tripData.forEach((d, i) => {
-                const opt = document.createElement('option');
-                opt.value = i; opt.text = `${d.day} (${d.date})`;
-                select.appendChild(opt);
-            });
-            select.value = dayIndex;
-
+            const modal = document.getElementById('edit-plan-modal');
+            document.getElementById('edit-plan-day').value = dayIndex;
             document.getElementById('edit-plan-time').value = evt.time;
             document.getElementById('edit-plan-type').value = evt.type;
             document.getElementById('edit-plan-text').value = evt.text;
             document.getElementById('edit-plan-link').value = evt.link || '';
             document.getElementById('edit-plan-important').checked = evt.important || false;
-            document.getElementById('edit-plan-modal').classList.add('active');
+            modal.classList.add('active');
         };
 
         window.saveEditedPlanEvent = () => {
@@ -481,7 +678,7 @@
             const important = document.getElementById('plan-important').checked;
             if (!time || !text) { showToast('請輸入內容'); return; }
 
-            // Add Mode Only (Edit handled by saveEditedPlanEvent)
+            // Add Mode
             sharedData.tripData[dayIndex].events.push({ id: Date.now() + Math.random(), time, text, type, link, important });
             currentPlanDayIndex = dayIndex; // Switch view to new day
             showToast('行程已新增');
@@ -525,45 +722,61 @@
                 return;
             }
 
-            // Create dedicated container for export
+            // Create dedicated container for export (Fixed 3:4 Aspect Ratio, Minimalist)
             const exportDiv = document.createElement('div');
             exportDiv.style.cssText = `
                 position: fixed; top: -9999px; left: -9999px;
                 width: 600px; height: 800px;
                 background-color: ${document.documentElement.classList.contains('dark') ? '#1c1917' : '#f4f4f0'};
                 color: ${document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#444444'};
-                padding: 40px; display: flex; flex-direction: column;
+                padding: 50px 40px; 
+                display: flex; flex-direction: column;
                 font-family: 'Noto Sans TC', sans-serif;
+                box-sizing: border-box;
             `;
 
-            // Header
+            // Minimalist Header
             let contentHtml = `
-                <div class="text-center mb-8 border-b-2 border-stone-300 dark:border-stone-700 pb-4">
-                    <h1 class="text-4xl font-serif font-bold mb-2">${activeDay.date}</h1>
-                    <p class="text-xl opacity-70">${activeDay.title}</p>
+                <div class="mb-10 text-center border-b-2 border-stone-300 dark:border-stone-700 pb-6 flex-shrink-0">
+                    <h1 class="text-5xl font-serif font-bold mb-3 tracking-wide">${activeDay.date}</h1>
+                    <p class="text-2xl opacity-60 font-light tracking-widest uppercase">${activeDay.title}</p>
                 </div>
-                <div class="flex-1 flex flex-col justify-center space-y-6">
+                <div class="flex-1 flex flex-col justify-center space-y-0 relative">
+                    <!-- Decor Line -->
+                    <div class="absolute left-[3.5rem] top-2 bottom-2 w-px bg-stone-300 dark:bg-stone-700"></div>
             `;
 
-            // Events (Time + Location only)
+            // Sort events
             const sortedEvents = [...activeDay.events].sort((a, b) => a.time.localeCompare(b.time));
+            
+            // Auto scale font size based on density
+            const isDense = sortedEvents.length > 8;
+            const fontSizeTime = isDense ? 'text-lg' : 'text-xl';
+            const fontSizeText = isDense ? 'text-xl' : 'text-2xl';
+            const gapSize = isDense ? 'mb-6' : 'mb-8';
+
             sortedEvents.forEach(evt => {
                 contentHtml += `
-                    <div class="flex items-baseline gap-6">
-                        <div class="text-2xl font-mono font-bold w-20 text-right opacity-80">${evt.time}</div>
-                        <div class="text-2xl font-bold flex-1 border-l-4 border-stone-300 dark:border-stone-600 pl-4 py-1">${evt.text}</div>
+                    <div class="flex items-baseline relative z-10 ${gapSize}">
+                        <div class="${fontSizeTime} font-mono font-bold w-14 text-right opacity-50 mr-8">${evt.time}</div>
+                        <div class="${fontSizeText} font-medium flex-1 tracking-wide leading-tight">${evt.text}</div>
                     </div>
                 `;
             });
-
             contentHtml += `</div>
-                <div class="mt-auto pt-4 text-center text-sm opacity-30 font-mono">Japan Trip Helper</div>`;
+                <div class="mt-auto pt-6 flex justify-between items-end opacity-20 flex-shrink-0">
+                    <span class="text-xs font-mono tracking-widest">JAPAN TRIP</span>
+                    <i class="fa-solid fa-plane text-xl"></i>
+                </div>`;
 
             exportDiv.innerHTML = contentHtml;
             document.body.appendChild(exportDiv);
 
             setTimeout(() => {
-                html2canvas(exportDiv, { useCORS: true, scale: 2 }).then(canvas => {
+                html2canvas(exportDiv, { 
+                    backgroundColor: null,
+                    useCORS: true, scale: 2 
+                }).then(canvas => {
                     const dataUrl = canvas.toDataURL("image/png");
                     document.getElementById('generated-image').src = dataUrl;
                     document.getElementById('download-link').href = dataUrl;
@@ -574,7 +787,7 @@
                     showToast("圖片生成失敗");
                     if(document.body.contains(exportDiv)) document.body.removeChild(exportDiv);
                 });
-            }, 100);
+            }, 500);
         };
 
         window.addGuideItem = () => {
@@ -582,14 +795,8 @@
             if(!title) return;
             sharedData.guideData.push({ id: Date.now(), title, desc, tip }); saveShared(); window.toggleGuideForm(); renderGuide();
         };
-        document.getElementById('save-guide-btn').onclick = () => {
-            const title = document.getElementById('edit-guide-title').value, desc = document.getElementById('edit-guide-desc').value, tip = document.getElementById('edit-guide-tip').value;
-            const idx = sharedData.guideData.findIndex(i => i.title === title);
-            if(idx >= 0) { sharedData.guideData[idx].desc = desc; sharedData.guideData[idx].tip = tip; } else { sharedData.guideData.push({ id: Date.now(), title, desc, tip }); }
-            saveShared(); closeModal('edit-guide-modal'); renderGuide();
-        };
-
-        window.initWallet = () => loadExpenses();
+        
+        window.initWallet = () => { loadExpenses(); renderExpenseAnalysis(); };
         window.addExpense = async () => {
             const name = document.getElementById('expense-name').value;
             const cat = document.getElementById('expense-cat').value;
@@ -655,30 +862,7 @@
             }
         }; saveShared(); closeModal('edit-flight-modal'); initFlightInfo(); showToast('航班已更新'); };
         window.openEditGuideModal = (t, d, tip) => { document.getElementById('edit-guide-title').value = t; document.getElementById('edit-guide-desc').value = d; document.getElementById('edit-guide-tip').value = tip; document.getElementById('edit-guide-search').href = `https://www.google.com/search?q=${encodeURIComponent(t + " 介紹")}`; document.getElementById('edit-guide-modal').classList.add('active'); };
-        
-        // Updated Flight Modal Open
-        window.openFlightModal = () => { 
-            const d = sharedData.flightData || {}; 
-            const out = d.outbound || { dep: "TPE", depTime: "02:30", arr: "NRT", arrTime: "06:35", num: "捷星 GK12" };
-            const inb = d.inbound || { dep: "NRT", depTime: "--:--", arr: "TPE", arrTime: "--:--", num: "--" };
-            
-            // Legacy migration check
-            if (d.depAirport) { out.dep = d.depAirport; out.depTime = d.depTime; out.arr = d.arrAirport; out.arrTime = d.arrTime; out.num = d.flightNum; }
-
-            document.getElementById('edit-out-dep').value = out.dep || "";
-            document.getElementById('edit-out-dep-time').value = out.depTime || "";
-            document.getElementById('edit-out-arr').value = out.arr || "";
-            document.getElementById('edit-out-arr-time').value = out.arrTime || "";
-            document.getElementById('edit-out-num').value = out.num || "";
-
-            document.getElementById('edit-in-dep').value = inb.dep || "";
-            document.getElementById('edit-in-dep-time').value = inb.depTime || "";
-            document.getElementById('edit-in-arr').value = inb.arr || "";
-            document.getElementById('edit-in-arr-time').value = inb.arrTime || "";
-            document.getElementById('edit-in-num').value = inb.num || "";
-
-            document.getElementById('edit-flight-modal').classList.add('active'); 
-        };
+        window.openFlightModal = () => { const d = sharedData.flightData || {}; document.getElementById('edit-out-dep').value = d.outbound?.dep || "TPE"; document.getElementById('edit-out-dep-time').value = d.outbound?.depTime || ""; document.getElementById('edit-out-arr').value = d.outbound?.arr || "NRT"; document.getElementById('edit-out-arr-time').value = d.outbound?.arrTime || ""; document.getElementById('edit-out-num').value = d.outbound?.num || ""; document.getElementById('edit-in-dep').value = d.inbound?.dep || "NRT"; document.getElementById('edit-in-dep-time').value = d.inbound?.depTime || ""; document.getElementById('edit-in-arr').value = d.inbound?.arr || "TPE"; document.getElementById('edit-in-arr-time').value = d.inbound?.arrTime || ""; document.getElementById('edit-in-num').value = d.inbound?.num || ""; document.getElementById('edit-flight-modal').classList.add('active'); };
         window.clearAllData = () => { showConfirm("重置所有？", async () => { sharedData = { tripData: [], guideData: [], flightData: {}, appSettings: {} }; localData = { expenses: [], checklist: [], memo: "" }; await saveShared(); saveLocal(); location.reload(); }); };
         window.switchTab = (tabId) => { document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active')); document.getElementById(`tab-${tabId}`).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active')); document.querySelector(`.nav-btn[data-target="${tabId}"]`).classList.add('active'); window.scrollTo(0,0); localStorage.setItem('activeTab', tabId); if(tabId === 'guide') renderGuide(); };
         window.toggleDarkMode = () => { const isDark = document.documentElement.classList.toggle('dark'); localStorage.setItem('darkMode', isDark); updateDarkModeIcon(isDark); };
@@ -726,174 +910,15 @@
             });
             list.innerHTML = `<div class="bg-stone-200 dark:bg-stone-700 p-3 rounded-lg mb-4 text-center transition-colors duration-300"><span class="text-xs text-stone-500 dark:text-stone-400">總計:</span> <span class="font-bold text-stone-700 dark:text-stone-200">¥${totalJPY.toLocaleString()}</span><span class="text-xs text-stone-400 dark:text-stone-500">(~NT$${Math.round(totalJPY * rate).toLocaleString()})</span></div>${html}`;
         }
-
-        function renderPlan() {
-            const container = document.getElementById('itinerary-container'); 
-            const selectorContainer = document.getElementById('day-selector');
-            const daySelect = document.getElementById('plan-day-select');
-            const editPlanDaySelect = document.getElementById('edit-plan-day'); // New Select for Edit Modal
-            
-            let eventsHtml = ''; let selectorHtml = ''; let selectOptions = '';
-            
-            // Validate index
-            if(currentPlanDayIndex >= sharedData.tripData.length) currentPlanDayIndex = 0;
-            if(sharedData.tripData.length === 0) { sharedData.tripData = [{ day: "第一天", date: "1/11", title: "抵達東京", events: [] }]; }
-
-            // 1. Render Horizontal Day Selector
-            sharedData.tripData.forEach((day, index) => {
-                const isActive = index === currentPlanDayIndex;
-                const activeClass = isActive ? 'bg-stone-700 text-white border-stone-700' : 'bg-white dark:bg-stone-800 text-stone-500 dark:text-stone-400 border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-700';
-                // Day Button
-                selectorHtml += `<button onclick="switchPlanDay(${index})" class="flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold border transition whitespace-nowrap ${activeClass}">${day.day}</button>`;
-                
-                // Form Select Options (for moving events)
-                selectOptions += `<option value="${index}">${day.day} (${day.date})</option>`;
-            });
-
-            // ADDED: "Add Day" button inside the selector
-            selectorHtml += `
-                <button onclick="addNewDay()" class="flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold border border-dashed border-stone-300 dark:border-stone-600 text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:border-stone-400 transition whitespace-nowrap">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-            `;
-
-            selectorContainer.innerHTML = selectorHtml;
-            daySelect.innerHTML = selectOptions;
-            editPlanDaySelect.innerHTML = selectOptions; // Populate edit modal selector
-
-            // 2. Render Active Day Events
-            const activeDay = sharedData.tripData[currentPlanDayIndex];
-            
-            // Render Header for Active Day with Export Button
-            eventsHtml += `
-                <div class="sticky top-0 z-10 bg-[#f4f4f0]/95 dark:bg-[#1c1917]/95 py-2 mb-4 border-b border-stone-200 dark:border-stone-800 backdrop-blur-sm transition-colors duration-300 flex justify-between items-end">
-                    <div>
-                        <h2 class="font-serif font-bold text-lg text-muji-text dark:text-stone-100 flex items-baseline gap-2 cursor-pointer" onclick="editDayHeader(${currentPlanDayIndex})">
-                            ${activeDay.date} <span class="text-sm font-sans text-muji-accent dark:text-stone-500 font-normal">${activeDay.title}</span>
-                            <i class="fa-solid fa-pen text-xs text-stone-300 ml-1"></i>
-                        </h2>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="exportDayImage()" class="text-stone-300 hover:text-stone-500 dark:hover:text-stone-300 text-xs p-2 bg-stone-100 dark:bg-stone-800 rounded-full no-capture" title="匯出圖片"><i class="fa-solid fa-camera"></i></button>
-                        <button onclick="deleteDay(${currentPlanDayIndex})" class="text-stone-300 hover:text-red-400 text-xs p-2 bg-stone-100 dark:bg-stone-800 rounded-full no-capture"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>
-            `;
-
-            // Render Events List
-            if (!activeDay.events || activeDay.events.length === 0) {
-                eventsHtml += `<div class="text-center text-stone-400 text-sm py-10">尚無行程，點擊下方按鈕新增。</div>`;
-            } else {
-                activeDay.events.sort((a, b) => a.time.localeCompare(b.time)).forEach((evt) => {
-                    const icon = getIconByType(evt.type);
-                    const highlightClass = evt.important ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-900/50' : 'bg-white border-transparent dark:bg-stone-800 dark:border-stone-700';
-                    const timeColor = evt.important ? 'text-amber-600 dark:text-amber-500 font-bold' : 'text-muji-text dark:text-stone-400';
-                    let actionBtn = evt.link ? `<a href="${evt.link}" target="_blank" class="ml-2 text-xs bg-stone-100 dark:bg-stone-700 px-2 py-0.5 rounded text-stone-500 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-600"><i class="fa-solid fa-map-location-dot"></i> 地圖</a>` : '';
-                    
-                    eventsHtml += `
-                        <div class="flex gap-4 relative group">
-                            <div class="flex flex-col items-center">
-                                <div class="w-2 h-2 rounded-full bg-stone-300 dark:bg-stone-600 mt-2"></div>
-                                <div class="w-0.5 flex-1 bg-stone-200 dark:bg-stone-700 my-1"></div>
-                            </div>
-                            <div class="flex-1 pb-6 relative">
-                                <div class="absolute top-0 right-0 z-10 flex gap-1 items-center no-capture">
-                                    <button onclick="editPlanEvent(${currentPlanDayIndex}, '${evt.id}')" class="text-stone-300 hover:text-stone-500 p-2"><i class="fa-solid fa-pen"></i></button>
-                                    <button onclick="deletePlanEvent(${currentPlanDayIndex}, '${evt.id}')" class="text-stone-300 hover:text-red-400 p-2"><i class="fa-solid fa-xmark"></i></button>
-                                </div>
-                                <div class="text-xs ${timeColor} mb-0.5">${evt.time}</div>
-                                <div class="p-3 rounded-lg border shadow-sm ${highlightClass} transition-colors duration-300">
-                                    <div class="flex items-start gap-2">
-                                        <i class="${icon} text-stone-400 dark:text-stone-500 mt-1 text-xs"></i>
-                                        <div class="text-sm text-muji-text dark:text-stone-200 font-medium leading-tight pr-16">${evt.text}${actionBtn}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>`;
-                });
-            }
-            container.innerHTML = eventsHtml;
-            // Also append the "Add Plan Event" button at the bottom of the list for the current day
-            const addBtnHtml = `
-                <button onclick="openAddPlanModal()" class="no-capture w-full mb-6 border-2 border-dashed border-stone-300 dark:border-stone-600 text-stone-400 dark:text-stone-500 rounded-xl p-3 flex flex-col items-center justify-center hover:bg-stone-50 dark:hover:bg-stone-800 transition group active:scale-95">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-calendar-plus text-lg group-hover:scale-110 transition-transform"></i>
-                        <span class="text-xs font-bold">新增行程項目</span>
-                    </div>
-                </button>
-            `;
-            container.insertAdjacentHTML('beforeend', addBtnHtml);
-        }
         
-        // ... (rest of code: renderGuide, renderChecklist, app settings, etc.) ...
-        function renderGuide() {
-            const container = document.getElementById('guide-container');
-            const itinerarySpots = new Set();
-            sharedData.tripData.forEach(day => { (day.events || []).forEach(evt => { if (evt.type === 'spot') itinerarySpots.add(evt.text); }); });
-            if (!Array.isArray(sharedData.guideData)) sharedData.guideData = [];
-            const allTitles = new Set([...itinerarySpots, ...sharedData.guideData.map(g => g.title)]);
-            let html = '';
-            if (allTitles.size === 0) html = '<div class="text-center text-stone-400 text-sm py-10">尚無景點，請在「行程表」新增類型為「景點」的項目。</div>';
-            else {
-                allTitles.forEach(title => {
-                    const existingGuide = sharedData.guideData.find(g => g.title === title);
-                    let desc = existingGuide ? existingGuide.desc : null; let tip = existingGuide ? existingGuide.tip : null; let isAutoFilled = false;
-                    if (!desc) { for (const [key, value] of Object.entries(knownLocations)) { if (title.includes(key)) { desc = value.desc; tip = value.tip; isAutoFilled = true; break; } } }
-                    if (!desc) desc = "點擊此處新增景點介紹...";
-                    const tipHtml = tip ? `<div class="bg-stone-50 dark:bg-stone-900/50 p-3 rounded-lg text-xs text-stone-600 dark:text-stone-300 border border-stone-100 dark:border-stone-700 mt-4"><span class="font-bold text-muji-primary dark:text-stone-400">💡 冷知識：</span> ${tip}</div>` : '';
-                    const safeTitle = title.replace(/'/g, "\\'").replace(/"/g, '&quot;'); const safeDesc = desc.replace(/'/g, "\\'").replace(/"/g, '&quot;'); const safeTip = tip ? tip.replace(/'/g, "\\'").replace(/"/g, '&quot;') : '';
-                    html += `<div class="bg-muji-card dark:bg-stone-800 rounded-xl overflow-hidden shadow-sm mb-6 border border-stone-100 dark:border-stone-700 transition-colors duration-300 relative group cursor-pointer" onclick="openEditGuideModal('${safeTitle}', '${existingGuide ? safeDesc : (isAutoFilled ? safeDesc : '')}', '${safeTip}')"><div class="absolute top-3 right-3 text-stone-300 p-2"><i class="fa-solid fa-pen"></i></div><div class="h-32 bg-stone-200 dark:bg-stone-700 relative overflow-hidden flex items-center justify-center"><i class="fa-solid fa-image text-4xl text-stone-300 dark:text-stone-600"></i></div><div class="p-5"><h3 class="font-serif text-lg font-bold text-muji-text dark:text-stone-100 mb-2">${title}</h3><p class="text-xs text-muji-accent dark:text-stone-400 leading-relaxed text-justify ${(!existingGuide && !isAutoFilled) ? 'italic opacity-50' : ''}">${desc}</p>${tipHtml}</div></div>`;
-                });
-            }
-            container.innerHTML = html;
-        }
-
-        function renderChecklist() {
-            const container = document.getElementById('checklist-container'); const progress = document.getElementById('checklist-progress');
-            const items = localData.checklist || [];
-            let html = ''; let checkedCount = 0;
-            if (items.length === 0) html = '<li class="text-center text-stone-400 text-xs py-2">清單是空的</li>';
-            else {
-                items.forEach((item, index) => {
-                    if(item.checked) checkedCount++;
-                    html += `<li class="flex items-center gap-3 bg-white dark:bg-stone-800 p-3 rounded-lg border border-stone-100 dark:border-stone-700 shadow-sm transition-colors duration-300 group"><input type="checkbox" id="check-${index}" class="muji-checkbox w-5 h-5 rounded border-stone-300 dark:border-stone-600 text-stone-600 focus:ring-stone-400 bg-white dark:bg-stone-700" ${item.checked ? 'checked' : ''} onchange="toggleCheck(${index})"><label for="check-${index}" class="text-sm text-muji-text dark:text-stone-200 flex-1 ${item.checked ? 'line-through text-stone-400 dark:text-stone-600' : ''}">${item.text}</label><button onclick="deleteChecklistItem(${index})" class="text-stone-300 hover:text-red-400 p-1"><i class="fa-solid fa-xmark"></i></button></li>`;
-                });
-            }
-            container.innerHTML = html; progress.innerText = `${checkedCount}/${items.length}`;
-        }
-        function renderAppSettings() { const s = sharedData.appSettings || {}; document.getElementById('app-title').innerText = s.title || "東京旅遊"; document.getElementById('app-date').innerText = s.date || "2026.01.11 - 01.18"; document.getElementById('setting-title').value = s.title || ""; document.getElementById('setting-date').value = s.date || ""; }
-        function initFlightInfo() { 
-            const d = sharedData.flightData || {}; 
-            // Handle both old and new data structures
-            const out = d.outbound || { dep: "TPE", depTime: "02:30", arr: "NRT", arrTime: "06:35", num: "捷星 GK12" };
-            const inb = d.inbound || { dep: "NRT", depTime: "--:--", arr: "TPE", arrTime: "--:--", num: "--" };
-            
-            // Legacy migration check
-            if (d.depAirport) { out.dep = d.depAirport; out.depTime = d.depTime; out.arr = d.arrAirport; out.arrTime = d.arrTime; out.num = d.flightNum; }
-
-            document.getElementById('disp-out-dep').innerText = out.dep;
-            document.getElementById('disp-out-dep-time').innerText = out.depTime;
-            document.getElementById('disp-out-arr').innerText = out.arr;
-            document.getElementById('disp-out-arr-time').innerText = out.arrTime;
-            document.getElementById('disp-out-flight').innerText = out.num;
-
-            document.getElementById('disp-in-dep').innerText = inb.dep;
-            document.getElementById('disp-in-dep-time').innerText = inb.depTime;
-            document.getElementById('disp-in-arr').innerText = inb.arr;
-            document.getElementById('disp-in-arr-time').innerText = inb.arrTime;
-            document.getElementById('disp-in-flight').innerText = inb.num;
-        }
-        
-        function getIconByType(type) { const map = { 'transport': 'fa-solid fa-train-subway', 'food': 'fa-solid fa-utensils', 'hotel': 'fa-solid fa-bed', 'spot': 'fa-solid fa-camera', 'shopping': 'fa-solid fa-bag-shopping' }; return map[type] || 'fa-solid fa-circle'; }
-        function showToast(msg) { const toast = document.getElementById('toast'); toast.innerText = msg; toast.classList.add('active'); setTimeout(() => toast.classList.remove('active'), 2500); }
-        let confirmCallback, editDayCallback;
-        function showConfirm(msg, cb) { document.getElementById('confirm-message').innerText = msg; confirmCallback = cb; document.getElementById('confirm-modal').classList.add('active'); }
-        function showEditDayModal(d, t, cb) { document.getElementById('edit-day-date').value = d; document.getElementById('edit-day-title').value = t; editDayCallback = cb; document.getElementById('edit-day-modal').classList.add('active'); }
-        document.getElementById('confirm-btn').onclick = () => { if(confirmCallback) confirmCallback(); closeModal('confirm-modal'); };
-        document.getElementById('save-day-btn').onclick = () => { if(editDayCallback) editDayCallback(document.getElementById('edit-day-date').value, document.getElementById('edit-day-title').value); closeModal('edit-day-modal'); };
-
+        // --- INIT ---
+        initDarkMode();
         renderLocalUI();
         initAuth();
+        // If offline immediately, render empty shared structure
+        if(isOfflineOnly) {
+            renderSharedUI();
+        }
     </script>
 </body>
 </html>
