@@ -67,9 +67,6 @@
 
         /* Hide elements during capture */
         .capturing .no-capture { display: none !important; }
-        
-        /* Export Container Hidden Style */
-        #export-temp-container { position: fixed; left: -9999px; top: 0; width: 600px; height: 800px; overflow: hidden; }
     </style>
 </head>
 <body>
@@ -426,31 +423,22 @@
             const evt = day.events.find(e => String(e.id) === String(eventId));
             if (!evt) return;
             editingEventState = { dayIndex, eventId };
-            document.getElementById('plan-form-title').innerText = "編輯行程";
-            document.getElementById('plan-day-select').value = dayIndex;
-            document.getElementById('plan-time').value = evt.time;
-            document.getElementById('plan-type').value = evt.type;
-            document.getElementById('plan-text').value = evt.text;
-            document.getElementById('plan-link').value = evt.link || '';
-            document.getElementById('plan-important').checked = evt.important || false;
             
-            // Populate Modal Fields (if using modal)
-            const modalDaySelect = document.getElementById('edit-plan-day');
-            if(modalDaySelect) {
-                 modalDaySelect.innerHTML = '';
-                 sharedData.tripData.forEach((d, i) => {
-                    const opt = document.createElement('option');
-                    opt.value = i; opt.text = `${d.day} (${d.date})`;
-                    modalDaySelect.appendChild(opt);
-                 });
-                 modalDaySelect.value = dayIndex;
-            }
-            if(document.getElementById('edit-plan-time')) document.getElementById('edit-plan-time').value = evt.time;
-            if(document.getElementById('edit-plan-type')) document.getElementById('edit-plan-type').value = evt.type;
-            if(document.getElementById('edit-plan-text')) document.getElementById('edit-plan-text').value = evt.text;
-            if(document.getElementById('edit-plan-link')) document.getElementById('edit-plan-link').value = evt.link || '';
-            if(document.getElementById('edit-plan-important')) document.getElementById('edit-plan-important').checked = evt.important || false;
+            // Populate Modal Options
+            const select = document.getElementById('edit-plan-day');
+            select.innerHTML = '';
+            sharedData.tripData.forEach((d, i) => {
+                const opt = document.createElement('option');
+                opt.value = i; opt.text = `${d.day} (${d.date})`;
+                select.appendChild(opt);
+            });
+            select.value = dayIndex;
 
+            document.getElementById('edit-plan-time').value = evt.time;
+            document.getElementById('edit-plan-type').value = evt.type;
+            document.getElementById('edit-plan-text').value = evt.text;
+            document.getElementById('edit-plan-link').value = evt.link || '';
+            document.getElementById('edit-plan-important').checked = evt.important || false;
             document.getElementById('edit-plan-modal').classList.add('active');
         };
 
@@ -531,44 +519,61 @@
         window.editDayHeader = (idx) => { const d = sharedData.tripData[idx]; showEditDayModal(d.date, d.title, (nD, nT) => { d.date = nD; d.title = nT; saveShared(); renderPlan(); }); };
 
         window.exportDayImage = () => {
-            const element = document.getElementById('itinerary-container');
-            if(!element) return;
-            element.classList.add('capturing');
-            
-            // Create a temporary clone for specific 3:4 formatting
-            const clone = element.cloneNode(true);
-            clone.style.width = '600px';
-            clone.style.minHeight = '800px';
-            clone.style.position = 'fixed';
-            clone.style.top = '-9999px';
-            clone.style.left = '-9999px';
-            clone.style.padding = '20px';
-            clone.style.backgroundColor = document.documentElement.classList.contains('dark') ? '#1c1917' : '#f4f4f0';
-            clone.style.color = document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#444444';
-            
-            // Inject Title
             const activeDay = sharedData.tripData[currentPlanDayIndex];
-            const titleHtml = `<div class="mb-4 text-center"><h2 class="text-xl font-bold font-serif">${activeDay.date}</h2><p class="text-sm opacity-70">${activeDay.title}</p></div>`;
-            clone.insertAdjacentHTML('afterbegin', titleHtml);
-            
-            // Remove buttons from clone
-            const buttons = clone.querySelectorAll('button, .no-capture');
-            buttons.forEach(b => b.remove());
-            
-            document.body.appendChild(clone);
-            
+            if (!activeDay || !activeDay.events || activeDay.events.length === 0) {
+                showToast("無行程可匯出");
+                return;
+            }
+
+            // Create dedicated container for export
+            const exportDiv = document.createElement('div');
+            exportDiv.style.cssText = `
+                position: fixed; top: -9999px; left: -9999px;
+                width: 600px; height: 800px;
+                background-color: ${document.documentElement.classList.contains('dark') ? '#1c1917' : '#f4f4f0'};
+                color: ${document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#444444'};
+                padding: 40px; display: flex; flex-direction: column;
+                font-family: 'Noto Sans TC', sans-serif;
+            `;
+
+            // Header
+            let contentHtml = `
+                <div class="text-center mb-8 border-b-2 border-stone-300 dark:border-stone-700 pb-4">
+                    <h1 class="text-4xl font-serif font-bold mb-2">${activeDay.date}</h1>
+                    <p class="text-xl opacity-70">${activeDay.title}</p>
+                </div>
+                <div class="flex-1 flex flex-col justify-center space-y-6">
+            `;
+
+            // Events (Time + Location only)
+            const sortedEvents = [...activeDay.events].sort((a, b) => a.time.localeCompare(b.time));
+            sortedEvents.forEach(evt => {
+                contentHtml += `
+                    <div class="flex items-baseline gap-6">
+                        <div class="text-2xl font-mono font-bold w-20 text-right opacity-80">${evt.time}</div>
+                        <div class="text-2xl font-bold flex-1 border-l-4 border-stone-300 dark:border-stone-600 pl-4 py-1">${evt.text}</div>
+                    </div>
+                `;
+            });
+
+            contentHtml += `</div>
+                <div class="mt-auto pt-4 text-center text-sm opacity-30 font-mono">Japan Trip Helper</div>`;
+
+            exportDiv.innerHTML = contentHtml;
+            document.body.appendChild(exportDiv);
+
             setTimeout(() => {
-                html2canvas(clone, { 
-                    backgroundColor: null,
-                    useCORS: true, scale: 2 
-                }).then(canvas => {
+                html2canvas(exportDiv, { useCORS: true, scale: 2 }).then(canvas => {
                     const dataUrl = canvas.toDataURL("image/png");
                     document.getElementById('generated-image').src = dataUrl;
                     document.getElementById('download-link').href = dataUrl;
                     document.getElementById('image-modal').classList.add('active');
-                    element.classList.remove('capturing');
-                    document.body.removeChild(clone);
-                }).catch(err => { console.error(err); showToast("圖片生成失敗"); element.classList.remove('capturing'); document.body.removeChild(clone); });
+                    document.body.removeChild(exportDiv);
+                }).catch(err => {
+                    console.error(err);
+                    showToast("圖片生成失敗");
+                    if(document.body.contains(exportDiv)) document.body.removeChild(exportDiv);
+                });
             }, 100);
         };
 
