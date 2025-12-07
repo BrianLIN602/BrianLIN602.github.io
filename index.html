@@ -22,6 +22,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas for image export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -58,6 +60,14 @@
         .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(40, 40, 40, 0.9); color: white; padding: 10px 20px; border-radius: 50px; font-size: 13px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 3000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .toast.active { opacity: 1; transform: translateX(-50%) translateY(0); }
         html.dark .toast { background: rgba(255, 255, 255, 0.9); color: #1c1917; }
+        
+        /* Progress Bar for Expenses */
+        .progress-bar-bg { background-color: #e5e5e5; border-radius: 99px; height: 6px; width: 100%; overflow: hidden; margin-top: 4px; }
+        html.dark .progress-bar-bg { background-color: #44403c; }
+        .progress-bar-fill { height: 100%; border-radius: 99px; transition: width 0.5s ease-in-out; }
+
+        /* Hide elements during capture */
+        .capturing .no-capture { display: none !important; }
     </style>
 </head>
 <body>
@@ -105,13 +115,13 @@
                     </div>
                 </div>
 
-                <button onclick="openAddPlanModal()" class="w-full mb-6 border-2 border-dashed border-stone-300 dark:border-stone-700 text-stone-400 dark:text-stone-500 rounded-xl p-3 flex flex-col items-center justify-center hover:bg-stone-50 dark:hover:bg-stone-800 transition group active:scale-95">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-calendar-plus text-lg group-hover:scale-110 transition-transform"></i><span class="text-xs font-bold">新增行程項目</span>
-                    </div>
-                </button>
+                <!-- Day Selector -->
+                <div id="day-selector" class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar items-center">
+                    <!-- JS will populate this -->
+                </div>
 
-                <div id="add-plan-form" class="hidden bg-white dark:bg-stone-800 p-5 rounded-xl shadow-lg border border-stone-100 dark:border-stone-700 mb-6 transition-all duration-300">
+                <!-- ADD PLAN FORM (Hidden initially) -->
+                <div id="add-plan-form" class="hidden bg-white dark:bg-stone-800 p-5 rounded-xl shadow-lg border border-stone-100 dark:border-stone-700 mb-6 transition-all duration-300 scroll-mt-20">
                     <h3 id="plan-form-title" class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3">新增行程</h3>
                     <div class="space-y-3">
                         <div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">選擇日期</label><select id="plan-day-select" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2"></select></div>
@@ -126,9 +136,10 @@
                     </div>
                 </div>
 
+                <!-- Itinerary Container (Target for screenshot) -->
                 <div id="itinerary-container" class="space-y-6"></div>
                 <div class="text-center mt-6 mb-8">
-                    <button onclick="addNewDay()" class="text-xs text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 border border-stone-200 dark:border-stone-700 px-4 py-2 rounded-full transition active:bg-stone-100 dark:active:bg-stone-800"><i class="fa-solid fa-plus mr-1"></i> 新增一天 (Day)</button>
+                    <!-- Add day button is inside the day selector now -->
                 </div>
             </div>
 
@@ -150,7 +161,35 @@
                     <div class="mb-2"><input type="text" id="calc-input" placeholder="輸入金額 (如 500+200)" class="w-full bg-transparent text-3xl font-mono text-right border-b border-stone-600 focus:outline-none focus:border-stone-400 pb-2 placeholder-stone-600 dark:placeholder-stone-700"></div>
                     <div class="flex justify-end items-end gap-2"><div class="text-stone-400 text-sm">≈ NT$</div><div id="calc-result-twd" class="text-xl font-bold">0</div></div>
                 </div>
-                <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6 transition-colors duration-300"><h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-4">新增消費 (僅本機儲存)</h3><div class="flex gap-2 mb-3"><input type="text" id="expense-name" placeholder="品項" class="flex-1 bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-3"><input type="number" id="expense-amount" placeholder="¥" class="w-24 bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-3"></div><div class="flex gap-2"><label class="flex-1 bg-stone-100 dark:bg-stone-700 text-stone-500 dark:text-stone-300 rounded-lg flex items-center justify-center gap-2 cursor-pointer hover:bg-stone-200 dark:hover:bg-stone-600 transition py-3"><i class="fa-solid fa-camera"></i><span class="text-xs">拍照</span><input type="file" id="expense-photo" accept="image/*" capture="environment" class="hidden"></label><button onclick="addExpense()" class="flex-1 bg-stone-700 dark:bg-stone-600 text-white rounded-lg text-sm font-bold hover:bg-stone-800 dark:hover:bg-stone-500 transition py-3">儲存</button></div><div id="photo-preview-name" class="text-xs text-muji-primary dark:text-stone-400 mt-2 hidden text-center truncate"></div></div>
+
+                <!-- Expense Chart -->
+                <div id="expense-analysis" class="bg-white dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6">
+                    <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3">消費統計</h3>
+                    <div id="expense-bars" class="space-y-3"></div>
+                </div>
+
+                <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6 transition-colors duration-300">
+                    <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-4">新增消費</h3>
+                    <div class="space-y-3">
+                        <div class="flex gap-2">
+                            <input type="text" id="expense-name" placeholder="品項" class="flex-[2] bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-3">
+                            <select id="expense-cat" class="flex-[1] bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-2 py-3 text-center">
+                                <option value="food">食</option>
+                                <option value="transport">行</option>
+                                <option value="shopping">購</option>
+                                <option value="ticket">樂</option>
+                                <option value="hotel">住</option>
+                                <option value="other">他</option>
+                            </select>
+                        </div>
+                        <input type="number" id="expense-amount" placeholder="¥ 金額" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-3">
+                        <div class="flex gap-2">
+                            <label class="flex-1 bg-stone-100 dark:bg-stone-700 text-stone-500 dark:text-stone-300 rounded-lg flex items-center justify-center gap-2 cursor-pointer hover:bg-stone-200 dark:hover:bg-stone-600 transition py-3"><i class="fa-solid fa-camera"></i><span class="text-xs">拍照</span><input type="file" id="expense-photo" accept="image/*" capture="environment" class="hidden"></label>
+                            <button onclick="addExpense()" class="flex-1 bg-stone-700 dark:bg-stone-600 text-white rounded-lg text-sm font-bold hover:bg-stone-800 dark:hover:bg-stone-500 transition py-3">儲存</button>
+                        </div>
+                        <div id="photo-preview-name" class="text-xs text-muji-primary dark:text-stone-400 mt-1 hidden text-center truncate"></div>
+                    </div>
+                </div>
                 <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3 px-1">消費紀錄</h3><div id="expense-list" class="space-y-3 pb-20"></div>
             </div>
 
@@ -173,6 +212,7 @@
                         <div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">旅程代碼 (分享給親友)</label><div class="flex gap-2"><div id="current-trip-id" class="flex-1 bg-stone-100 dark:bg-stone-900 dark:text-white rounded-lg p-3 text-center font-mono font-bold text-lg tracking-wider select-all">...</div><button onclick="copyTripId()" class="bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 px-4 rounded-lg"><i class="fa-regular fa-copy"></i></button></div></div><div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">加入其他旅程</label><div class="flex gap-2"><input type="text" id="join-trip-input" placeholder="輸入代碼" class="flex-1 bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2 uppercase"><button onclick="joinTrip()" class="bg-stone-700 dark:bg-stone-600 text-white px-4 rounded-lg text-sm font-bold">連線</button></div></div>
                     </div>
                 </div>
+                <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6"><h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-4 uppercase border-b border-stone-100 dark:border-stone-700 pb-2">資料備份 (本機)</h3><div class="flex gap-2"><button onclick="exportLocalData()" class="flex-1 bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 rounded-lg text-xs py-2 hover:bg-stone-200"><i class="fa-solid fa-download mr-1"></i>匯出備份</button><label class="flex-1 bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 rounded-lg text-xs py-2 hover:bg-stone-200 text-center cursor-pointer"><i class="fa-solid fa-upload mr-1"></i>匯入還原<input type="file" id="import-file" accept=".json" class="hidden" onchange="importLocalData(this)"></label></div></div>
                 <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6"><h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-4 uppercase border-b border-stone-100 dark:border-stone-700 pb-2">旅程設定</h3><div class="space-y-3"><div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">標題 (同步)</label><input type="text" id="setting-title" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2"></div><div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">日期 (同步)</label><input type="text" id="setting-date" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2"></div><button onclick="saveShared()" class="w-full bg-stone-700 dark:bg-stone-600 text-white rounded-lg text-sm font-bold py-2 mt-2">儲存設定</button></div></div>
                 <div class="grid grid-cols-2 gap-4 mb-6"><a href="https://www.jma.go.jp/jma/index.html" target="_blank" class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl text-center border border-blue-100 dark:border-blue-900/30 block"><i class="fa-solid fa-cloud-sun-rain text-2xl text-blue-400 mb-2"></i><div class="text-sm font-bold text-stone-600 dark:text-stone-200">天氣</div></a><a href="https://www.google.com/maps/search/Police+Station" target="_blank" class="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl text-center border border-red-100 dark:border-red-900/30 block"><i class="fa-solid fa-shield-halved text-2xl text-red-400 mb-2"></i><div class="text-sm font-bold text-stone-600 dark:text-stone-200">警察</div></a></div>
                 <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6"><h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3 uppercase border-b border-stone-100 dark:border-stone-700 pb-2">緊急聯絡</h3><div class="space-y-3"><div class="flex justify-between text-sm"><span class="text-muji-text dark:text-stone-200">救護車 / 火警</span><span class="font-bold text-red-500 font-mono">119</span></div><div class="flex justify-between text-sm"><span class="text-muji-text dark:text-stone-200">大阪辦事處</span><span class="font-bold text-muji-text dark:text-stone-200 font-mono">+81-90-8794-4568</span></div></div></div>
@@ -193,6 +233,8 @@
         <div id="edit-day-modal" class="modal-overlay"><div class="modal-box"><h3 class="font-bold text-lg mb-4 dark:text-white">編輯標題</h3><div class="space-y-4 mb-6"><input type="text" id="edit-day-date" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded"><input type="text" id="edit-day-title" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded"></div><div class="flex justify-end gap-3"><button onclick="closeModal('edit-day-modal')" class="text-sm text-gray-500">取消</button><button id="save-day-btn" class="text-sm bg-stone-700 text-white px-4 py-2 rounded">儲存</button></div></div></div>
         <div id="edit-flight-modal" class="modal-overlay"><div class="modal-box"><h3 class="font-bold text-lg mb-4 dark:text-white">編輯航班</h3><div class="space-y-3 mb-6"><div class="flex gap-2"><input type="text" id="edit-dep-airport" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"><input type="time" id="edit-dep-time" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div><div class="flex gap-2"><input type="text" id="edit-arr-airport" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"><input type="time" id="edit-arr-time" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div><input type="text" id="edit-flight-num" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div><div class="flex justify-end gap-3"><button onclick="closeModal('edit-flight-modal')" class="text-sm text-gray-500">取消</button><button onclick="saveFlightInfo()" class="text-sm bg-stone-700 text-white px-4 py-2 rounded">儲存</button></div></div></div>
         <div id="edit-guide-modal" class="modal-overlay"><div class="modal-box"><h3 class="font-bold text-lg mb-4 dark:text-white">編輯介紹</h3><input type="hidden" id="edit-guide-id"><div class="space-y-3 mb-6"><div class="flex gap-2"><input type="text" id="edit-guide-title" class="flex-1 bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm" readonly><a id="edit-guide-search" href="#" target="_blank" class="bg-blue-100 text-blue-600 px-3 rounded flex items-center"><i class="fa-brands fa-google"></i></a></div><textarea id="edit-guide-desc" rows="5" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></textarea><input type="text" id="edit-guide-tip" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm" placeholder="冷知識"></div><div class="flex justify-end gap-3"><button onclick="closeModal('edit-guide-modal')" class="text-sm text-gray-500">取消</button><button id="save-guide-btn" class="text-sm bg-stone-700 text-white px-4 py-2 rounded">儲存</button></div></div></div>
+        <!-- IMAGE PREVIEW MODAL -->
+        <div id="image-modal" class="modal-overlay"><div class="modal-box w-full max-w-lg p-0 overflow-hidden relative"><button onclick="closeModal('image-modal')" class="absolute top-2 right-2 text-gray-500 bg-white rounded-full w-8 h-8 flex items-center justify-center z-10"><i class="fa-solid fa-xmark"></i></button><div class="p-4 bg-stone-100 dark:bg-stone-900 text-center"><h3 class="text-sm font-bold text-muji-text dark:text-white mb-2">行程圖卡</h3><p class="text-[10px] text-gray-500 mb-2">長按圖片可儲存</p><img id="generated-image" class="w-full rounded-lg shadow-md mb-3" src="" alt="行程圖"><a id="download-link" href="#" download="trip_plan.png" class="inline-block w-full bg-stone-700 text-white py-2 rounded-lg text-sm">下載圖片</a></div></div></div>
         <div id="toast" class="toast"></div>
     </div>
 
@@ -250,6 +292,7 @@
             appSettings: { title: "東京旅遊", date: "2026.01.11 - 01.18" }
         };
         let localData = { checklist: [], expenses: [], memo: "" };
+        let currentPlanDayIndex = 0; // State for horizontal tab selection
         
         const storedShared = localStorage.getItem('sharedDataBackup');
         if(storedShared) sharedData = JSON.parse(storedShared);
@@ -262,7 +305,7 @@
 
         const knownLocations = { "淺草寺": { desc: "東京都內最古老的寺廟...", tip: "求籤如果是「凶」，請將籤詩綁在架子上化解。" }, "雷門": { desc: "淺草寺的表參道入口...", tip: "燈籠底部有龍的雕刻。" } };
 
-        let editingEventState = null; // Track editing state { dayIndex, eventId }
+        let editingEventState = null;
 
         // --- AUTH & SYNC ---
         const initAuth = async () => {
@@ -322,29 +365,36 @@
             if (!newId) return;
             if (confirm(`切換到 [${newId}]？`)) { currentTripId = newId; initSync(); showToast(`已切換`); input.value = ''; }
         };
-        window.togglePlanForm = () => document.getElementById('add-plan-form').classList.toggle('hidden');
+        window.togglePlanForm = () => {
+            const form = document.getElementById('add-plan-form');
+            form.classList.toggle('hidden');
+            if(!form.classList.contains('hidden')) {
+                form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        };
         window.toggleGuideForm = () => document.getElementById('add-guide-form').classList.toggle('hidden');
         window.closeModal = (id) => document.getElementById(id).classList.remove('active');
         
         window.openAddPlanModal = () => {
             editingEventState = null;
             document.getElementById('plan-form-title').innerText = "新增行程";
+            // Default select current day
+            document.getElementById('plan-day-select').value = currentPlanDayIndex;
             document.getElementById('plan-text').value = ''; 
             document.getElementById('plan-link').value = '';
             document.getElementById('plan-time').value = '';
             document.getElementById('plan-important').checked = false;
-            document.getElementById('add-plan-form').classList.remove('hidden');
+            
+            const form = document.getElementById('add-plan-form');
+            form.classList.remove('hidden');
+            form.scrollIntoView({ behavior: 'smooth', block: 'center' });
         };
 
         window.editPlanEvent = (dayIndex, eventId) => {
-            // Find event
             const day = sharedData.tripData[dayIndex];
             const evt = day.events.find(e => String(e.id) === String(eventId));
             if (!evt) return;
-
             editingEventState = { dayIndex, eventId };
-            
-            // Populate form
             document.getElementById('plan-form-title').innerText = "編輯行程";
             document.getElementById('plan-day-select').value = dayIndex;
             document.getElementById('plan-time').value = evt.time;
@@ -353,7 +403,39 @@
             document.getElementById('plan-link').value = evt.link || '';
             document.getElementById('plan-important').checked = evt.important || false;
             
-            document.getElementById('add-plan-form').classList.remove('hidden');
+            const form = document.getElementById('add-plan-form');
+            form.classList.remove('hidden');
+            form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        };
+
+        window.saveEditedPlanEvent = () => {
+            if (!editingEventState) return;
+            const newDayIndex = parseInt(document.getElementById('edit-plan-day').value);
+            const time = document.getElementById('edit-plan-time').value;
+            const type = document.getElementById('edit-plan-type').value;
+            const text = document.getElementById('edit-plan-text').value;
+            const link = document.getElementById('edit-plan-link').value;
+            const important = document.getElementById('edit-plan-important').checked;
+
+            if (!time || !text) { showToast('請輸入內容'); return; }
+
+            const oldDayIdx = editingEventState.dayIndex;
+            const oldDay = sharedData.tripData[oldDayIdx];
+            const evtId = editingEventState.eventId;
+            
+            // Remove from old
+            oldDay.events = oldDay.events.filter(e => String(e.id) !== String(evtId));
+            
+            // Add to new
+            sharedData.tripData[newDayIndex].events.push({ id: evtId, time, text, type, link, important });
+            
+            // Switch view if day changed
+            if(newDayIndex !== oldDayIdx) currentPlanDayIndex = newDayIndex;
+
+            saveShared();
+            window.closeModal('edit-plan-modal');
+            renderPlan();
+            showToast('行程已更新');
         };
 
         window.savePlanEvent = () => {
@@ -363,40 +445,79 @@
             const text = document.getElementById('plan-text').value;
             const link = document.getElementById('plan-link').value;
             const important = document.getElementById('plan-important').checked;
-
             if (!time || !text) { showToast('請輸入內容'); return; }
 
             if (editingEventState) {
-                // Edit Mode
-                // Remove from old location (might be different day if user changed day select)
                 const oldDayIdx = editingEventState.dayIndex;
                 const oldDay = sharedData.tripData[oldDayIdx];
                 const evtId = editingEventState.eventId;
-                
-                // Remove old event
                 oldDay.events = oldDay.events.filter(e => String(e.id) !== String(evtId));
-                
-                // Add new event (keep ID)
                 sharedData.tripData[dayIndex].events.push({ id: evtId, time, text, type, link, important });
-                
+                if (oldDayIdx !== dayIndex) currentPlanDayIndex = dayIndex;
                 showToast('行程已更新');
             } else {
-                // Add Mode
                 sharedData.tripData[dayIndex].events.push({ id: Date.now() + Math.random(), time, text, type, link, important });
+                currentPlanDayIndex = dayIndex; // Switch view to new day
                 showToast('行程已新增');
             }
-
-            saveShared();
-            document.getElementById('add-plan-form').classList.add('hidden');
-            renderPlan(); 
+            saveShared(); document.getElementById('add-plan-form').classList.add('hidden'); renderPlan(); 
         };
-
-        // Renamed from addPlanEvent to avoid confusion, though button calls savePlanEvent now
         
         window.deletePlanEvent = (dIdx, eId) => { showConfirm('刪除？', () => { sharedData.tripData[dIdx].events = sharedData.tripData[dIdx].events.filter(e => String(e.id) !== String(eId)); saveShared(); renderPlan(); }); };
-        window.addNewDay = () => { sharedData.tripData.push({ day: `第${sharedData.tripData.length+1}天`, date: "日期待定", title: "自由活動", events: [] }); saveShared(); renderPlan(); };
-        window.deleteDay = (idx) => { showConfirm('刪除整天？', () => { sharedData.tripData.splice(idx, 1); saveShared(); renderPlan(); }); };
+        
+        // Switch Day Logic
+        window.switchPlanDay = (index) => {
+            currentPlanDayIndex = index;
+            renderPlan();
+        };
+
+        window.addNewDay = () => { 
+            sharedData.tripData.push({ day: `第${sharedData.tripData.length+1}天`, date: "日期待定", title: "自由活動", events: [] }); 
+            currentPlanDayIndex = sharedData.tripData.length - 1; // Switch to new day
+            saveShared(); 
+            renderPlan(); 
+        };
+        
+        window.deleteDay = (idx) => { 
+            showConfirm('刪除整天？', () => { 
+                sharedData.tripData.splice(idx, 1); 
+                // Adjust current index if needed
+                if (currentPlanDayIndex >= sharedData.tripData.length) {
+                    currentPlanDayIndex = Math.max(0, sharedData.tripData.length - 1);
+                }
+                saveShared(); 
+                renderPlan(); 
+            }); 
+        };
+        
         window.editDayHeader = (idx) => { const d = sharedData.tripData[idx]; showEditDayModal(d.date, d.title, (nD, nT) => { d.date = nD; d.title = nT; saveShared(); renderPlan(); }); };
+
+        // Export Plan Image Logic
+        window.exportDayImage = () => {
+            const element = document.getElementById('itinerary-container');
+            if(!element) return;
+            // Add capturing class to hide buttons
+            element.classList.add('capturing');
+            
+            // Wait for DOM to update
+            setTimeout(() => {
+                html2canvas(element, { 
+                    backgroundColor: document.documentElement.classList.contains('dark') ? '#1c1917' : '#f4f4f0',
+                    useCORS: true,
+                    scale: 2 // High resolution
+                }).then(canvas => {
+                    const dataUrl = canvas.toDataURL("image/png");
+                    document.getElementById('generated-image').src = dataUrl;
+                    document.getElementById('download-link').href = dataUrl;
+                    document.getElementById('image-modal').classList.add('active');
+                    element.classList.remove('capturing'); // Restore buttons
+                }).catch(err => {
+                    console.error(err);
+                    showToast("圖片生成失敗");
+                    element.classList.remove('capturing');
+                });
+            }, 100);
+        };
 
         window.addGuideItem = () => {
             const title = document.getElementById('guide-title').value, desc = document.getElementById('guide-desc').value, tip = document.getElementById('guide-tip').value;
@@ -413,15 +534,45 @@
         window.initWallet = () => loadExpenses();
         window.addExpense = async () => {
             const name = document.getElementById('expense-name').value;
+            const cat = document.getElementById('expense-cat').value;
             const amount = parseFloat(document.getElementById('expense-amount').value);
             if(!name || !amount) { showToast("請輸入"); return; }
             const fileInput = document.getElementById('expense-photo');
             let photoData = null;
             if(fileInput.files && fileInput.files[0]) { try { photoData = await processImage(fileInput.files[0]); } catch(e){} }
-            localData.expenses.unshift({ id: Date.now(), date: new Date().toLocaleString('zh-TW', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}), name, amount, photo: photoData });
-            saveLocal(); loadExpenses(); document.getElementById('expense-name').value = ''; document.getElementById('expense-amount').value = ''; fileInput.value = ''; showToast('已記帳');
+            localData.expenses.unshift({ id: Date.now(), date: new Date().toLocaleString('zh-TW', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}), name, amount, category: cat, photo: photoData });
+            saveLocal(); loadExpenses(); renderExpenseAnalysis(); document.getElementById('expense-name').value = ''; document.getElementById('expense-amount').value = ''; fileInput.value = ''; showToast('已記帳');
         };
-        window.deleteExpense = (id) => { showConfirm('刪除？', () => { localData.expenses = localData.expenses.filter(e => String(e.id) !== String(id)); saveLocal(); loadExpenses(); }); };
+        window.deleteExpense = (id) => { showConfirm('刪除？', () => { localData.expenses = localData.expenses.filter(e => String(e.id) !== String(id)); saveLocal(); loadExpenses(); renderExpenseAnalysis(); }); };
+
+        // Export/Import Local Data
+        window.exportLocalData = () => {
+            const dataStr = JSON.stringify(localData);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = `JapanTrip_Backup_${new Date().toISOString().slice(0,10)}.json`;
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        };
+
+        window.importLocalData = (input) => {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if(confirm("確定要還原備份嗎？現有的記帳與清單將被覆蓋。")) {
+                        localData = imported;
+                        saveLocal();
+                        renderLocalUI();
+                        showToast("還原成功");
+                    }
+                } catch(err) { showToast("檔案格式錯誤"); }
+            };
+            reader.readAsText(file);
+        };
 
         window.addChecklistItem = () => { const val = document.getElementById('new-checklist-item').value; if(val) { localData.checklist.push({text: val, checked: false}); saveLocal(); renderChecklist(); document.getElementById('new-checklist-item').value = ''; } };
         window.toggleCheck = (i) => { localData.checklist[i].checked = !localData.checklist[i].checked; saveLocal(); renderChecklist(); };
@@ -444,41 +595,137 @@
 
         // Render Functions
         function renderSharedUI() { renderPlan(); renderGuide(); renderAppSettings(); initFlightInfo(); }
-        function renderLocalUI() { loadExpenses(); renderChecklist(); document.getElementById('memo-area').value = localData.memo; parseMemoLinks(); }
+        function renderLocalUI() { loadExpenses(); renderExpenseAnalysis(); renderChecklist(); document.getElementById('memo-area').value = localData.memo; parseMemoLinks(); }
         
+        function renderExpenseAnalysis() {
+            const expenses = localData.expenses || [];
+            if(expenses.length === 0) { document.getElementById('expense-analysis').classList.add('hidden'); return; }
+            document.getElementById('expense-analysis').classList.remove('hidden');
+            const totals = {}; let grandTotal = 0;
+            expenses.forEach(e => { const cat = e.category || 'other'; totals[cat] = (totals[cat] || 0) + e.amount; grandTotal += e.amount; });
+            const cats = { 'food': '食', 'transport': '行', 'shopping': '購', 'ticket': '樂', 'hotel': '住', 'other': '他' };
+            const colors = { 'food': 'bg-red-400', 'transport': 'bg-blue-400', 'shopping': 'bg-purple-400', 'ticket': 'bg-yellow-400', 'hotel': 'bg-green-400', 'other': 'bg-gray-400' };
+            let html = '';
+            for(const [key, label] of Object.entries(cats)) {
+                const val = totals[key] || 0;
+                if(val > 0) {
+                    const pct = Math.round((val / grandTotal) * 100);
+                    html += `<div class="flex items-center text-xs mb-1"><div class="w-8 text-stone-500">${label}</div><div class="flex-1"><div class="flex justify-between mb-1"><span>¥${val.toLocaleString()}</span><span>${pct}%</span></div><div class="progress-bar-bg"><div class="progress-bar-fill ${colors[key]}" style="width:${pct}%"></div></div></div></div>`;
+                }
+            }
+            document.getElementById('expense-bars').innerHTML = html;
+        }
+
         function loadExpenses() {
             const list = document.getElementById('expense-list'); const expenses = localData.expenses || []; const rate = parseFloat(document.getElementById('exchange-rate').value) || 0.22;
             if(expenses.length === 0) { list.innerHTML = '<div class="text-center text-stone-400 text-xs py-4">尚未有記帳紀錄。</div>'; return; }
             let html = ''; let totalJPY = 0;
+            const catIcons = { 'food': 'fa-utensils', 'transport': 'fa-train-subway', 'shopping': 'fa-bag-shopping', 'ticket': 'fa-ticket', 'hotel': 'fa-bed', 'other': 'fa-circle-question' };
+            const catColors = { 'food': 'text-red-400 bg-red-50 dark:bg-red-900/20', 'transport': 'text-blue-400 bg-blue-50 dark:bg-blue-900/20', 'shopping': 'text-purple-400 bg-purple-50 dark:bg-purple-900/20', 'ticket': 'text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20', 'hotel': 'text-green-400 bg-green-50 dark:bg-green-900/20', 'other': 'text-gray-400 bg-gray-50 dark:bg-gray-900/20' };
             expenses.forEach(ex => {
                 totalJPY += ex.amount; const twd = Math.round(ex.amount * rate);
-                const hasPhoto = ex.photo ? `<img src="${ex.photo}" class="w-10 h-10 object-cover rounded-lg border border-stone-200 dark:border-stone-600" onclick="viewImage('${ex.photo}')">` : '<div class="w-10 h-10 bg-stone-100 dark:bg-stone-700 rounded-lg flex items-center justify-center text-stone-300 dark:text-stone-500"><i class="fa-solid fa-receipt"></i></div>';
+                const cat = ex.category || 'other'; const iconClass = catIcons[cat]; const colorClass = catColors[cat];
+                const hasPhoto = ex.photo ? `<img src="${ex.photo}" class="w-10 h-10 object-cover rounded-lg border border-stone-200 dark:border-stone-600" onclick="viewImage('${ex.photo}')">` : `<div class="w-10 h-10 rounded-lg flex items-center justify-center ${colorClass}"><i class="fa-solid ${iconClass}"></i></div>`;
                 html += `<div class="flex items-center gap-3 bg-white dark:bg-stone-800 p-3 rounded-xl shadow-sm border border-stone-50 dark:border-stone-700 transition-colors duration-300">${hasPhoto}<div class="flex-1 min-w-0"><div class="text-sm font-bold text-muji-text dark:text-stone-200 truncate">${ex.name}</div><div class="text-[10px] text-stone-400 dark:text-stone-500">${ex.date}</div></div><div class="text-right"><div class="text-sm font-bold text-muji-text dark:text-stone-200">¥${ex.amount.toLocaleString()}</div><div class="text-[10px] text-stone-400 dark:text-stone-500">≈ NT$${twd.toLocaleString()}</div></div><button onclick="deleteExpense('${ex.id}')" class="text-stone-300 hover:text-red-400 px-2"><i class="fa-solid fa-trash"></i></button></div>`;
             });
             list.innerHTML = `<div class="bg-stone-200 dark:bg-stone-700 p-3 rounded-lg mb-4 text-center transition-colors duration-300"><span class="text-xs text-stone-500 dark:text-stone-400">總計:</span> <span class="font-bold text-stone-700 dark:text-stone-200">¥${totalJPY.toLocaleString()}</span><span class="text-xs text-stone-400 dark:text-stone-500">(~NT$${Math.round(totalJPY * rate).toLocaleString()})</span></div>${html}`;
         }
 
         function renderPlan() {
-            const container = document.getElementById('itinerary-container'); const daySelect = document.getElementById('plan-day-select');
-            let html = ''; let selectHtml = '';
-            // Add day if empty
-            if(!sharedData.tripData || sharedData.tripData.length === 0) { sharedData.tripData = [{ day: "第一天", date: "1/11", title: "抵達東京", events: [] }]; }
+            const container = document.getElementById('itinerary-container'); 
+            const selectorContainer = document.getElementById('day-selector');
+            const daySelect = document.getElementById('plan-day-select');
+            let eventsHtml = ''; let selectorHtml = ''; let selectOptions = '';
+            
+            // Validate index
+            if(currentPlanDayIndex >= sharedData.tripData.length) currentPlanDayIndex = 0;
+            if(sharedData.tripData.length === 0) { sharedData.tripData = [{ day: "第一天", date: "1/11", title: "抵達東京", events: [] }]; }
+
+            // 1. Render Horizontal Day Selector
             sharedData.tripData.forEach((day, index) => {
-                selectHtml += `<option value="${index}">${day.day} (${day.date})</option>`;
-                let eventsHtml = '';
-                (day.events || []).sort((a, b) => a.time.localeCompare(b.time)).forEach((evt) => {
+                const isActive = index === currentPlanDayIndex;
+                const activeClass = isActive ? 'bg-stone-700 text-white border-stone-700' : 'bg-white dark:bg-stone-800 text-stone-500 dark:text-stone-400 border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-700';
+                // Day Button
+                selectorHtml += `<button onclick="switchPlanDay(${index})" class="flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold border transition whitespace-nowrap ${activeClass}">${day.day}</button>`;
+                
+                // Form Select Options (for moving events)
+                selectOptions += `<option value="${index}">${day.day} (${day.date})</option>`;
+            });
+
+            // ADDED: "Add Day" button inside the selector
+            selectorHtml += `
+                <button onclick="addNewDay()" class="flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold border border-dashed border-stone-300 dark:border-stone-600 text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:border-stone-400 transition whitespace-nowrap">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            `;
+
+            selectorContainer.innerHTML = selectorHtml;
+            daySelect.innerHTML = selectOptions;
+
+            // 2. Render Active Day Events
+            const activeDay = sharedData.tripData[currentPlanDayIndex];
+            
+            // Render Header for Active Day with Export Button
+            eventsHtml += `
+                <div class="sticky top-0 z-10 bg-[#f4f4f0]/95 dark:bg-[#1c1917]/95 py-2 mb-4 border-b border-stone-200 dark:border-stone-800 backdrop-blur-sm transition-colors duration-300 flex justify-between items-end">
+                    <div>
+                        <h2 class="font-serif font-bold text-lg text-muji-text dark:text-stone-100 flex items-baseline gap-2 cursor-pointer" onclick="editDayHeader(${currentPlanDayIndex})">
+                            ${activeDay.date} <span class="text-sm font-sans text-muji-accent dark:text-stone-500 font-normal">${activeDay.title}</span>
+                            <i class="fa-solid fa-pen text-xs text-stone-300 ml-1"></i>
+                        </h2>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="exportDayImage()" class="text-stone-300 hover:text-stone-500 dark:hover:text-stone-300 text-xs p-2 bg-stone-100 dark:bg-stone-800 rounded-full no-capture" title="匯出圖片"><i class="fa-solid fa-camera"></i></button>
+                        <button onclick="deleteDay(${currentPlanDayIndex})" class="text-stone-300 hover:text-red-400 text-xs p-2 bg-stone-100 dark:bg-stone-800 rounded-full no-capture"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+
+            // Render Events List
+            if (!activeDay.events || activeDay.events.length === 0) {
+                eventsHtml += `<div class="text-center text-stone-400 text-sm py-10">尚無行程，點擊下方按鈕新增。</div>`;
+            } else {
+                activeDay.events.sort((a, b) => a.time.localeCompare(b.time)).forEach((evt) => {
                     const icon = getIconByType(evt.type);
                     const highlightClass = evt.important ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-900/50' : 'bg-white border-transparent dark:bg-stone-800 dark:border-stone-700';
                     const timeColor = evt.important ? 'text-amber-600 dark:text-amber-500 font-bold' : 'text-muji-text dark:text-stone-400';
                     let actionBtn = evt.link ? `<a href="${evt.link}" target="_blank" class="ml-2 text-xs bg-stone-100 dark:bg-stone-700 px-2 py-0.5 rounded text-stone-500 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-600"><i class="fa-solid fa-map-location-dot"></i> 地圖</a>` : '';
-                    // Added EDIT button next to DELETE
-                    eventsHtml += `<div class="flex gap-4 relative group"><div class="flex flex-col items-center"><div class="w-2 h-2 rounded-full bg-stone-300 dark:bg-stone-600 mt-2"></div><div class="w-0.5 flex-1 bg-stone-200 dark:bg-stone-700 my-1"></div></div><div class="flex-1 pb-6 relative"><div class="absolute top-0 right-0 z-10 flex gap-1"><button onclick="editPlanEvent(${index}, '${evt.id}')" class="text-stone-300 hover:text-stone-500 p-2"><i class="fa-solid fa-pen"></i></button><button onclick="deletePlanEvent(${index}, '${evt.id}')" class="text-stone-300 hover:text-red-400 p-2"><i class="fa-solid fa-xmark"></i></button></div><div class="text-xs ${timeColor} mb-0.5">${evt.time}</div><div class="p-3 rounded-lg border shadow-sm ${highlightClass} transition-colors duration-300"><div class="flex items-start gap-2"><i class="${icon} text-stone-400 dark:text-stone-500 mt-1 text-xs"></i><div class="text-sm text-muji-text dark:text-stone-200 font-medium leading-tight pr-6">${evt.text}${actionBtn}</div></div></div></div></div>`;
+                    
+                    eventsHtml += `
+                        <div class="flex gap-4 relative group">
+                            <div class="flex flex-col items-center">
+                                <div class="w-2 h-2 rounded-full bg-stone-300 dark:bg-stone-600 mt-2"></div>
+                                <div class="w-0.5 flex-1 bg-stone-200 dark:bg-stone-700 my-1"></div>
+                            </div>
+                            <div class="flex-1 pb-6 relative">
+                                <div class="absolute top-0 right-0 z-10 flex gap-1 items-center no-capture">
+                                    <button onclick="editPlanEvent(${currentPlanDayIndex}, '${evt.id}')" class="text-stone-300 hover:text-stone-500 p-2"><i class="fa-solid fa-pen"></i></button>
+                                    <button onclick="deletePlanEvent(${currentPlanDayIndex}, '${evt.id}')" class="text-stone-300 hover:text-red-400 p-2"><i class="fa-solid fa-xmark"></i></button>
+                                </div>
+                                <div class="text-xs ${timeColor} mb-0.5">${evt.time}</div>
+                                <div class="p-3 rounded-lg border shadow-sm ${highlightClass} transition-colors duration-300">
+                                    <div class="flex items-start gap-2">
+                                        <i class="${icon} text-stone-400 dark:text-stone-500 mt-1 text-xs"></i>
+                                        <div class="text-sm text-muji-text dark:text-stone-200 font-medium leading-tight pr-16">${evt.text}${actionBtn}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
                 });
-                html += `<div class="relative group"><div class="sticky top-16 z-10 bg-[#f4f4f0]/95 dark:bg-[#1c1917]/95 py-2 mb-2 border-b border-stone-200 dark:border-stone-800 backdrop-blur-sm transition-colors duration-300 flex justify-between items-end"><h2 class="font-serif font-bold text-lg text-muji-text dark:text-stone-100 flex items-baseline gap-2 cursor-pointer" onclick="editDayHeader(${index})">${day.date} <span class="text-sm font-sans text-muji-accent dark:text-stone-500 font-normal">${day.day} - ${day.title}</span></h2><div class="flex gap-2"><button onclick="editDayHeader(${index})" class="text-stone-300 hover:text-stone-500 dark:hover:text-stone-300 text-xs p-2 bg-stone-100 dark:bg-stone-800 rounded-full"><i class="fa-solid fa-pen"></i></button><button onclick="deleteDay(${index})" class="text-stone-300 hover:text-red-400 text-xs p-2 bg-stone-100 dark:bg-stone-800 rounded-full"><i class="fa-solid fa-trash"></i></button></div></div><div class="pl-2">${eventsHtml}</div></div>`;
-            });
-            container.innerHTML = html; daySelect.innerHTML = selectHtml; renderGuide();
+            }
+            container.innerHTML = eventsHtml;
+            // Also append the "Add Plan Event" button at the bottom of the list for the current day
+            const addBtnHtml = `
+                <button onclick="openAddPlanModal()" class="no-capture w-full mb-6 border-2 border-dashed border-stone-300 dark:border-stone-600 text-stone-400 dark:text-stone-500 rounded-xl p-3 flex flex-col items-center justify-center hover:bg-stone-50 dark:hover:bg-stone-800 transition group active:scale-95">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-plus text-lg group-hover:scale-110 transition-transform"></i>
+                        <span class="text-xs font-bold">新增行程項目</span>
+                    </div>
+                </button>
+            `;
+            container.insertAdjacentHTML('beforeend', addBtnHtml);
         }
-
+        
         function renderGuide() {
             const container = document.getElementById('guide-container');
             const itinerarySpots = new Set();
