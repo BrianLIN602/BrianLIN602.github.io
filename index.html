@@ -96,40 +96,48 @@
                         <h3 class="text-xs font-bold text-muji-primary dark:text-stone-400 mb-2 uppercase tracking-wide">航班</h3>
                         
                         <!-- Outbound Compact -->
-                        <div class="mb-2 border-b border-stone-100 dark:border-stone-700 pb-2">
-                            <div class="flex justify-between items-baseline mb-0.5">
-                                <span id="disp-out-dep" class="text-sm font-bold text-muji-text dark:text-stone-100">TPE</span>
-                                <i class="fa-solid fa-plane text-[10px] text-stone-300 transform rotate-45"></i>
-                                <span id="disp-out-arr" class="text-sm font-bold text-muji-text dark:text-stone-100">NRT</span>
+                        <div class="mb-3 border-b border-stone-100 dark:border-stone-700 pb-2">
+                            <div class="flex justify-between items-end text-center">
+                                <div>
+                                    <div id="disp-out-dep" class="text-lg font-bold text-muji-text dark:text-stone-100 leading-none">TPE</div>
+                                    <div id="disp-out-dep-time" class="text-[10px] font-mono text-muji-accent dark:text-stone-400 mt-1">02:30</div>
+                                </div>
+                                <div class="flex flex-col items-center pb-1">
+                                    <i class="fa-solid fa-plane text-xs text-stone-300 transform rotate-45 mb-0.5"></i>
+                                    <div id="disp-out-flight" class="text-[9px] text-stone-400 tracking-wider">GK12</div>
+                                </div>
+                                <div>
+                                    <div id="disp-out-arr" class="text-lg font-bold text-muji-text dark:text-stone-100 leading-none">NRT</div>
+                                    <div id="disp-out-arr-time" class="text-[10px] font-mono text-muji-accent dark:text-stone-400 mt-1">06:35</div>
+                                </div>
                             </div>
-                            <div class="flex justify-between items-center text-[10px] text-muji-accent dark:text-stone-400">
-                                <span id="disp-out-dep-time" class="font-mono">02:30</span>
-                                <span id="disp-out-flight" class="scale-90 origin-right">GK12</span>
-                            </div>
-                            <span id="disp-out-arr-time" class="hidden">06:35</span>
                         </div>
 
                         <!-- Inbound Compact -->
                         <div>
-                            <div class="flex justify-between items-baseline mb-0.5">
-                                <span id="disp-in-dep" class="text-sm font-bold text-muji-text dark:text-stone-100">NRT</span>
-                                <i class="fa-solid fa-plane text-[10px] text-stone-300 transform rotate-45"></i>
-                                <span id="disp-in-arr" class="text-sm font-bold text-muji-text dark:text-stone-100">TPE</span>
+                            <div class="flex justify-between items-end text-center">
+                                <div>
+                                    <div id="disp-in-dep" class="text-lg font-bold text-muji-text dark:text-stone-100 leading-none">NRT</div>
+                                    <div id="disp-in-dep-time" class="text-[10px] font-mono text-muji-accent dark:text-stone-400 mt-1">--:--</div>
+                                </div>
+                                <div class="flex flex-col items-center pb-1">
+                                    <i class="fa-solid fa-plane text-xs text-stone-300 transform rotate-45 mb-0.5"></i>
+                                    <div id="disp-in-flight" class="text-[9px] text-stone-400 tracking-wider">--</div>
+                                </div>
+                                <div>
+                                    <div id="disp-in-arr" class="text-lg font-bold text-muji-text dark:text-stone-100 leading-none">TPE</div>
+                                    <div id="disp-in-arr-time" class="text-[10px] font-mono text-muji-accent dark:text-stone-400 mt-1">--:--</div>
+                                </div>
                             </div>
-                            <div class="flex justify-between items-center text-[10px] text-muji-accent dark:text-stone-400">
-                                <span id="disp-in-dep-time" class="font-mono">--:--</span>
-                                <span id="disp-in-flight" class="scale-90 origin-right">--</span>
-                            </div>
-                            <span id="disp-in-arr-time" class="hidden">--:--</span>
                         </div>
                     </div>
 
                     <!-- Right: Weather Card -->
-                    <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl shadow-sm border border-blue-100 dark:border-blue-900/30 flex flex-col justify-between relative overflow-hidden" onclick="updateWeather()">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl shadow-sm border border-blue-100 dark:border-blue-900/30 flex flex-col justify-between relative overflow-hidden cursor-pointer" onclick="updateWeather(true)">
                         <div class="absolute -right-2 -top-2 opacity-10 text-6xl text-blue-500"><i class="fa-solid fa-cloud"></i></div>
                         <div class="flex justify-between items-start z-10">
                             <h3 class="text-xs font-bold text-blue-800 dark:text-blue-200">目前天氣</h3>
-                            <button onclick="event.stopPropagation(); updateWeather()" class="text-blue-400 hover:text-blue-600 animate-pulse"><i class="fa-solid fa-location-arrow text-[10px]"></i></button>
+                            <button class="text-blue-400 hover:text-blue-600 animate-pulse"><i class="fa-solid fa-location-arrow text-[10px]"></i></button>
                         </div>
                         
                         <div class="flex items-center justify-between mt-1 z-10">
@@ -137,7 +145,7 @@
                             <i id="weather-icon-main" class="fa-solid fa-cloud-sun text-2xl text-blue-400 dark:text-blue-300"></i>
                         </div>
                         
-                        <div class="text-[10px] text-blue-500 dark:text-blue-400 mt-2 text-right z-10 font-medium truncate" id="weather-desc">點擊定位</div>
+                        <div class="text-[10px] text-blue-500 dark:text-blue-400 mt-2 text-right z-10 font-medium truncate" id="weather-desc">點擊更新</div>
                     </div>
                 </div>
 
@@ -282,6 +290,10 @@
         let currentUser = null;
         let currentTripId = localStorage.getItem('currentTripId') || 'TRIP-' + Math.floor(1000 + Math.random() * 9000);
         let unsubscribeSnapshot = null;
+        // Optimization: Weather Cache
+        let weatherCache = { data: null, timestamp: 0 };
+        // Optimization: DOM Cache
+        let UI = {};
 
         // ↓↓↓ 請將您的 Firebase 設定貼在下方 ↓↓↓
         const myFirebaseConfig = {
@@ -328,7 +340,7 @@
             appSettings: { title: "東京旅遊", date: "2026.01.11 - 01.18" }
         };
         let localData = { checklist: [], expenses: [], memo: "" };
-        let currentPlanDayIndex = 0; // State for horizontal tab selection
+        let currentPlanDayIndex = 0; 
         
         const storedShared = localStorage.getItem('sharedDataBackup');
         if(storedShared) sharedData = JSON.parse(storedShared);
@@ -445,7 +457,6 @@
 
         // --- RENDER LOGIC ---
         function renderPlan() {
-            // Render Day Selector
             const daySelector = document.getElementById('day-selector');
             daySelector.innerHTML = '';
             sharedData.tripData.forEach((d, i) => {
@@ -461,19 +472,16 @@
             addBtn.onclick = window.addNewDay;
             daySelector.appendChild(addBtn);
 
-            // Populate Day Select in Add Form & Edit Modal
             const dayOptions = sharedData.tripData.map((d, i) => `<option value="${i}">${d.day} - ${d.date}</option>`).join('');
             document.getElementById('plan-day-select').innerHTML = dayOptions;
             document.getElementById('edit-plan-day').innerHTML = dayOptions;
 
-            // Render Itinerary
             const container = document.getElementById('itinerary-container');
             container.innerHTML = '';
             
             if (sharedData.tripData.length > 0) {
                 const day = sharedData.tripData[currentPlanDayIndex];
                 
-                // Header
                 const headerHtml = `
                     <div class="flex justify-between items-end mb-4 border-l-4 border-stone-400 pl-3">
                         <div>
@@ -489,7 +497,6 @@
                 `;
                 container.innerHTML = headerHtml;
 
-                // Events
                 const events = day.events.sort((a,b) => a.time.localeCompare(b.time));
                 if (events.length === 0) {
                     container.innerHTML += `<div onclick="openAddPlanModal()" class="border-2 border-dashed border-stone-300 dark:border-stone-700 rounded-xl p-8 text-center text-stone-400 cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-800 transition"><i class="fa-regular fa-calendar-plus text-2xl mb-2"></i><div class="text-xs">點擊新增行程</div></div>`;
@@ -539,7 +546,6 @@
             });
 
             const manualGuides = sharedData.guideData || [];
-            
             let html = '';
             manualGuides.forEach(g => {
                 html += `
@@ -605,11 +611,13 @@
             document.getElementById('disp-out-dep').innerText = out.dep || 'TPE';
             document.getElementById('disp-out-dep-time').innerText = out.depTime || '--:--';
             document.getElementById('disp-out-arr').innerText = out.arr || 'NRT';
+            document.getElementById('disp-out-arr-time').innerText = out.arrTime || '--:--';
             document.getElementById('disp-out-flight').innerText = out.num || 'GK12';
 
             document.getElementById('disp-in-dep').innerText = inc.dep || 'NRT';
             document.getElementById('disp-in-dep-time').innerText = inc.depTime || '--:--';
             document.getElementById('disp-in-arr').innerText = inc.arr || 'TPE';
+            document.getElementById('disp-in-arr-time').innerText = inc.arrTime || '--:--';
             document.getElementById('disp-in-flight').innerText = inc.num || '--';
             
             document.getElementById('edit-out-dep').value = out.dep || 'TPE';
@@ -625,11 +633,17 @@
             document.getElementById('edit-in-num').value = inc.num || '';
         }
         
-        window.updateWeather = function() {
+        window.updateWeather = function(force = false) {
             const tempEl = document.getElementById('weather-temp-val');
             const descEl = document.getElementById('weather-desc');
             const iconEl = document.getElementById('weather-icon-main');
             
+            // Optimization: Use cached weather data if < 10 mins old
+            if (!force && weatherCache.data && (Date.now() - weatherCache.timestamp < 600000)) {
+                renderWeatherData(weatherCache.data, tempEl, descEl, iconEl);
+                return;
+            }
+
             tempEl.innerText = "--°";
             tempEl.classList.add('animate-pulse');
             descEl.innerText = "定位中...";
@@ -639,16 +653,14 @@
                     const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
                     const data = await res.json();
                     if(data.current_weather) {
-                        const t = Math.round(data.current_weather.temperature);
-                        const code = data.current_weather.weathercode;
-                        tempEl.innerText = `${t}°`;
-                        descEl.innerText = `${label} ${getWmoDesc(code)}`;
-                        
-                        if(code <= 3) iconEl.className = "fa-solid fa-cloud-sun text-2xl text-yellow-500";
-                        else if(code <= 48) iconEl.className = "fa-solid fa-smog text-2xl text-stone-400";
-                        else if(code <= 67) iconEl.className = "fa-solid fa-cloud-rain text-2xl text-blue-400";
-                        else if(code <= 82) iconEl.className = "fa-solid fa-snowflake text-2xl text-cyan-300";
-                        else iconEl.className = "fa-solid fa-bolt text-2xl text-yellow-600";
+                        const weatherData = {
+                            t: Math.round(data.current_weather.temperature),
+                            code: data.current_weather.weathercode,
+                            label: label
+                        };
+                        // Cache result
+                        weatherCache = { data: weatherData, timestamp: Date.now() };
+                        renderWeatherData(weatherData, tempEl, descEl, iconEl);
                     }
                 } catch(e) {
                     console.error(e);
@@ -673,6 +685,18 @@
                 { timeout: 5000, enableHighAccuracy: false }
             );
         };
+
+        function renderWeatherData(data, tempEl, descEl, iconEl) {
+            tempEl.innerText = `${data.t}°`;
+            descEl.innerText = `${data.label} ${getWmoDesc(data.code)}`;
+            
+            const code = data.code;
+            if(code <= 3) iconEl.className = "fa-solid fa-cloud-sun text-2xl text-yellow-500";
+            else if(code <= 48) iconEl.className = "fa-solid fa-smog text-2xl text-stone-400";
+            else if(code <= 67) iconEl.className = "fa-solid fa-cloud-rain text-2xl text-blue-400";
+            else if(code <= 82) iconEl.className = "fa-solid fa-snowflake text-2xl text-cyan-300";
+            else iconEl.className = "fa-solid fa-bolt text-2xl text-yellow-600";
+        }
 
         function getWmoDesc(code) {
             const wmo = {
@@ -702,7 +726,12 @@
             const input = document.getElementById('join-trip-input');
             const newId = input.value.trim().toUpperCase();
             if (!newId) return;
-            if (confirm(`切換到 [${newId}]？`)) { currentTripId = newId; initSync(); showToast(`已切換`); input.value = ''; }
+            if (confirm(`切換到 [${newId}]？`)) { 
+                currentTripId = newId; 
+                initSync(); 
+                showToast(`已切換`); 
+                input.value = ''; 
+            }
         };
         window.togglePlanForm = () => {
             const form = document.getElementById('add-plan-form');
@@ -1034,7 +1063,7 @@
             expenses.forEach(ex => {
                 totalJPY += ex.amount; const twd = Math.round(ex.amount * rate);
                 const cat = ex.category || 'other'; const iconClass = catIcons[cat]; const colorClass = catColors[cat];
-                const hasPhoto = ex.photo ? `<img src="${ex.photo}" class="w-10 h-10 object-cover rounded-lg border border-stone-200 dark:border-stone-600" onclick="viewImage('${ex.photo}')">` : `<div class="w-10 h-10 rounded-lg flex items-center justify-center ${colorClass}"><i class="fa-solid ${iconClass}"></i></div>`;
+                const hasPhoto = ex.photo ? `<img loading="lazy" src="${ex.photo}" class="w-10 h-10 object-cover rounded-lg border border-stone-200 dark:border-stone-600" onclick="viewImage('${ex.photo}')">` : `<div class="w-10 h-10 rounded-lg flex items-center justify-center ${colorClass}"><i class="fa-solid ${iconClass}"></i></div>`;
                 html += `<div class="flex items-center gap-3 bg-white dark:bg-stone-800 p-3 rounded-xl shadow-sm border border-stone-50 dark:border-stone-700 transition-colors duration-300">${hasPhoto}<div class="flex-1 min-w-0"><div class="text-sm font-bold text-muji-text dark:text-stone-200 truncate">${ex.name}</div><div class="text-[10px] text-stone-400 dark:text-stone-500">${ex.date}</div></div><div class="text-right"><div class="text-sm font-bold text-muji-text dark:text-stone-200">¥${ex.amount.toLocaleString()}</div><div class="text-[10px] text-stone-400 dark:text-stone-500">≈ NT$${twd.toLocaleString()}</div></div><button onclick="deleteExpense('${ex.id}')" class="text-stone-300 hover:text-red-400 px-2"><i class="fa-solid fa-trash"></i></button></div>`;
             });
             list.innerHTML = `<div class="bg-stone-200 dark:bg-stone-700 p-3 rounded-lg mb-4 text-center transition-colors duration-300"><span class="text-xs text-stone-500 dark:text-stone-400">總計:</span> <span class="font-bold text-stone-700 dark:text-stone-200">¥${totalJPY.toLocaleString()}</span><span class="text-xs text-stone-400 dark:text-stone-500">(~NT$${Math.round(totalJPY * rate).toLocaleString()})</span></div>${html}`;
