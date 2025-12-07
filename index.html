@@ -67,6 +67,9 @@
 
         /* Hide elements during capture */
         .capturing .no-capture { display: none !important; }
+        
+        /* Export Container Hidden Style */
+        #export-temp-container { position: fixed; left: -9999px; top: 0; width: 600px; height: 800px; overflow: hidden; }
     </style>
 </head>
 <body>
@@ -313,7 +316,10 @@
         let sharedData = {
             tripData: [{ day: "第一天", date: "1/11", title: "抵達東京", events: [] }],
             guideData: [],
-            flightData: { depAirport: "TPE", depTime: "02:30", arrAirport: "NRT", arrTime: "06:35", flightNum: "捷星 GK12" },
+            flightData: { 
+                outbound: { dep: "TPE", depTime: "02:30", arr: "NRT", arrTime: "06:35", num: "捷星 GK12" },
+                inbound: { dep: "NRT", depTime: "--:--", arr: "TPE", arrTime: "--:--", num: "--" }
+            },
             appSettings: { title: "東京旅遊", date: "2026.01.11 - 01.18" }
         };
         let localData = { checklist: [], expenses: [], memo: "" };
@@ -427,7 +433,25 @@
             document.getElementById('plan-text').value = evt.text;
             document.getElementById('plan-link').value = evt.link || '';
             document.getElementById('plan-important').checked = evt.important || false;
-            document.getElementById('add-plan-form').classList.remove('hidden');
+            
+            // Populate Modal Fields (if using modal)
+            const modalDaySelect = document.getElementById('edit-plan-day');
+            if(modalDaySelect) {
+                 modalDaySelect.innerHTML = '';
+                 sharedData.tripData.forEach((d, i) => {
+                    const opt = document.createElement('option');
+                    opt.value = i; opt.text = `${d.day} (${d.date})`;
+                    modalDaySelect.appendChild(opt);
+                 });
+                 modalDaySelect.value = dayIndex;
+            }
+            if(document.getElementById('edit-plan-time')) document.getElementById('edit-plan-time').value = evt.time;
+            if(document.getElementById('edit-plan-type')) document.getElementById('edit-plan-type').value = evt.type;
+            if(document.getElementById('edit-plan-text')) document.getElementById('edit-plan-text').value = evt.text;
+            if(document.getElementById('edit-plan-link')) document.getElementById('edit-plan-link').value = evt.link || '';
+            if(document.getElementById('edit-plan-important')) document.getElementById('edit-plan-important').checked = evt.important || false;
+
+            document.getElementById('edit-plan-modal').classList.add('active');
         };
 
         window.saveEditedPlanEvent = () => {
@@ -469,19 +493,11 @@
             const important = document.getElementById('plan-important').checked;
             if (!time || !text) { showToast('請輸入內容'); return; }
 
-            if (editingEventState) {
-                const oldDayIdx = editingEventState.dayIndex;
-                const oldDay = sharedData.tripData[oldDayIdx];
-                const evtId = editingEventState.eventId;
-                oldDay.events = oldDay.events.filter(e => String(e.id) !== String(evtId));
-                sharedData.tripData[dayIndex].events.push({ id: evtId, time, text, type, link, important });
-                if (oldDayIdx !== dayIndex) currentPlanDayIndex = dayIndex;
-                showToast('行程已更新');
-            } else {
-                sharedData.tripData[dayIndex].events.push({ id: Date.now() + Math.random(), time, text, type, link, important });
-                currentPlanDayIndex = dayIndex; // Switch view to new day
-                showToast('行程已新增');
-            }
+            // Add Mode Only (Edit handled by saveEditedPlanEvent)
+            sharedData.tripData[dayIndex].events.push({ id: Date.now() + Math.random(), time, text, type, link, important });
+            currentPlanDayIndex = dayIndex; // Switch view to new day
+            showToast('行程已新增');
+            
             saveShared(); document.getElementById('add-plan-form').classList.add('hidden'); renderPlan(); 
         };
         
@@ -518,9 +534,32 @@
             const element = document.getElementById('itinerary-container');
             if(!element) return;
             element.classList.add('capturing');
+            
+            // Create a temporary clone for specific 3:4 formatting
+            const clone = element.cloneNode(true);
+            clone.style.width = '600px';
+            clone.style.minHeight = '800px';
+            clone.style.position = 'fixed';
+            clone.style.top = '-9999px';
+            clone.style.left = '-9999px';
+            clone.style.padding = '20px';
+            clone.style.backgroundColor = document.documentElement.classList.contains('dark') ? '#1c1917' : '#f4f4f0';
+            clone.style.color = document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#444444';
+            
+            // Inject Title
+            const activeDay = sharedData.tripData[currentPlanDayIndex];
+            const titleHtml = `<div class="mb-4 text-center"><h2 class="text-xl font-bold font-serif">${activeDay.date}</h2><p class="text-sm opacity-70">${activeDay.title}</p></div>`;
+            clone.insertAdjacentHTML('afterbegin', titleHtml);
+            
+            // Remove buttons from clone
+            const buttons = clone.querySelectorAll('button, .no-capture');
+            buttons.forEach(b => b.remove());
+            
+            document.body.appendChild(clone);
+            
             setTimeout(() => {
-                html2canvas(element, { 
-                    backgroundColor: document.documentElement.classList.contains('dark') ? '#1c1917' : '#f4f4f0',
+                html2canvas(clone, { 
+                    backgroundColor: null,
                     useCORS: true, scale: 2 
                 }).then(canvas => {
                     const dataUrl = canvas.toDataURL("image/png");
@@ -528,7 +567,8 @@
                     document.getElementById('download-link').href = dataUrl;
                     document.getElementById('image-modal').classList.add('active');
                     element.classList.remove('capturing');
-                }).catch(err => { console.error(err); showToast("圖片生成失敗"); element.classList.remove('capturing'); });
+                    document.body.removeChild(clone);
+                }).catch(err => { console.error(err); showToast("圖片生成失敗"); element.classList.remove('capturing'); document.body.removeChild(clone); });
             }, 100);
         };
 
@@ -686,6 +726,8 @@
             const container = document.getElementById('itinerary-container'); 
             const selectorContainer = document.getElementById('day-selector');
             const daySelect = document.getElementById('plan-day-select');
+            const editPlanDaySelect = document.getElementById('edit-plan-day'); // New Select for Edit Modal
+            
             let eventsHtml = ''; let selectorHtml = ''; let selectOptions = '';
             
             // Validate index
@@ -712,6 +754,7 @@
 
             selectorContainer.innerHTML = selectorHtml;
             daySelect.innerHTML = selectOptions;
+            editPlanDaySelect.innerHTML = selectOptions; // Populate edit modal selector
 
             // 2. Render Active Day Events
             const activeDay = sharedData.tripData[currentPlanDayIndex];
