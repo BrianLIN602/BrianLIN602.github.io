@@ -30,7 +30,8 @@
             theme: {
                 extend: {
                     colors: {
-                        muji: { base: '#f4f4f0', text: '#444444', accent: '#7b7b7b', card: '#ffffff', primary: '#8c8c88', alert: '#bf6a6a' }
+                        muji: { base: '#f4f4f0', text: '#444444', accent: '#7b7b7b', card: '#ffffff', primary: '#8c8c88', alert: '#bf6a6a' },
+                        tokyo: { red: '#ce3138', paper: '#fcf9f2', dot: '#e6e2d3' }
                     },
                     fontFamily: { sans: ['"Noto Sans TC"', 'sans-serif'], serif: ['"Noto Serif TC"', 'serif'] }
                 }
@@ -39,10 +40,79 @@
     </script>
 
     <style>
-        body { background-color: #e5e5e5; font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s; overscroll-behavior-y: none; }
-        html.dark body { background-color: #111; }
-        #app-container { background-color: #f4f4f0; color: #444444; min-height: 100vh; padding-top: env(safe-area-inset-top); padding-bottom: calc(80px + env(safe-area-inset-bottom)); box-shadow: 0 0 20px rgba(0,0,0,0.05); transition: background-color 0.3s, color 0.3s; }
-        html.dark #app-container { background-color: #1c1917; color: #e5e7eb; }
+        /* Shared Styles */
+        body { font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s; overscroll-behavior-y: none; }
+        
+        /* Dark Mode - Tokyo Night Style */
+        html.dark body { background-color: #050505; }
+        html.dark #app-container { 
+            background-color: rgba(0, 0, 0, 0.65); /* Deep dark overlay */
+            color: #e5e7eb; 
+            isolation: isolate;
+        }
+
+        /* Dark Mode Background Layer (Tokyo Night View) */
+        html.dark #app-container::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            /* Real Photo: Tokyo Tower Night View */
+            background-image: url('https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1000&q=80');
+            background-repeat: no-repeat;
+            background-position: center 20%; /* Focus on the skyline */
+            background-size: cover;
+            opacity: 0.5; /* Visible background */
+            filter: blur(3px) brightness(0.7); /* Blur to keep text readable */
+        }
+
+        /* Glassmorphism for Dark Mode Cards */
+        html.dark .bg-stone-800, 
+        html.dark .bg-muji-card,
+        html.dark .bg-white {
+            /* Override tailwind bg colors in dark mode for glass effect */
+            background-color: rgba(30, 30, 35, 0.6) !important; 
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08) !important; /* Subtle border */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Neon Glow for Title in Dark Mode */
+        html.dark #app-title {
+            text-shadow: 0 0 15px rgba(206, 49, 56, 0.5); /* Tokyo Red Glow */
+        }
+
+        /* Light Mode - Tokyo/Japan Style (Real Photo Background) */
+        html:not(.dark) body {
+            background-color: #dedede; 
+        }
+        html:not(.dark) #app-container {
+            background-color: rgba(252, 249, 242, 0.85); /* Washi color with transparency */
+            color: #444444;
+            box-shadow: 0 0 40px rgba(0,0,0,0.15);
+            /* Important: Create a stacking context for the pseudo-element */
+            isolation: isolate; 
+        }
+        
+        /* Real Photo Background Layer */
+        html:not(.dark) #app-container::before {
+            content: "";
+            position: absolute;
+            inset: 0; /* top:0, right:0, bottom:0, left:0 */
+            z-index: -1;
+            /* Real Photo: Mount Fuji with Cherry Blossoms */
+            background-image: url('https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=1000&q=80');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover; /* Cover the whole area */
+            opacity: 0.18; /* Low opacity to keep text readable */
+            filter: grayscale(10%) sepia(10%); /* Subtle vintage feel */
+        }
+
+        /* Tokyo Red Accent for Light Mode Title */
+        html:not(.dark) .tokyo-accent { color: #ce3138; }
+
+        #app-container { min-height: 100vh; padding-top: env(safe-area-inset-top); padding-bottom: calc(80px + env(safe-area-inset-bottom)); transition: background-color 0.3s, color 0.3s; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
         .tab-content.active { display: block; }
@@ -71,13 +141,16 @@
     <div id="app-container" class="max-w-md mx-auto relative overflow-hidden">
         
         <!-- Header -->
-        <header class="bg-muji-base dark:bg-stone-900 sticky top-0 z-50 px-6 py-4 border-b border-stone-200 dark:border-stone-800 flex justify-between items-center bg-opacity-95 backdrop-blur-sm transition-colors duration-300">
+        <header class="bg-white/20 dark:bg-black/30 sticky top-0 z-50 px-6 py-4 border-b border-white/20 dark:border-white/10 flex justify-between items-center backdrop-blur-md transition-colors duration-300">
             <div>
-                <h1 id="app-title" class="font-serif text-xl font-bold text-muji-text dark:text-stone-100 tracking-widest">東京旅遊</h1>
-                <p id="app-date" class="text-xs text-muji-accent dark:text-stone-400 mt-0.5">2026.01.11 - 01.18</p>
+                <h1 id="app-title" class="font-serif text-xl font-bold text-muji-text dark:text-stone-100 tracking-widest flex items-center gap-2">
+                    <i class="fa-solid fa-torii-gate tokyo-accent dark:text-stone-500 text-lg opacity-80"></i>
+                    <span>東京旅遊</span>
+                </h1>
+                <p id="app-date" class="text-xs text-muji-accent dark:text-stone-400 mt-0.5 ml-7">2026.01.11 - 01.18</p>
             </div>
             <div class="flex items-center gap-4">
-                <button onclick="toggleDarkMode()" class="text-muji-primary dark:text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition p-1">
+                <button onclick="toggleDarkMode()" class="text-muji-primary dark:text-stone-400 hover:text-tokyo-red dark:hover:text-stone-200 transition p-1">
                     <i id="dark-mode-icon" class="fa-solid fa-moon text-lg"></i>
                 </button>
             </div>
@@ -91,7 +164,7 @@
                 <div class="grid grid-cols-2 gap-3 mb-6">
                     
                     <!-- Left: Compact Flight Card -->
-                    <div class="bg-muji-card dark:bg-stone-800 p-4 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 transition-colors duration-300 relative group flex flex-col justify-between">
+                    <div class="bg-white dark:bg-stone-800 p-4 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 transition-colors duration-300 relative group flex flex-col justify-between">
                         <button onclick="openFlightModal()" class="absolute top-2 right-2 text-stone-300 hover:text-stone-500 dark:hover:text-stone-300 p-1"><i class="fa-solid fa-pen text-xs"></i></button>
                         <h3 class="text-xs font-bold text-muji-primary dark:text-stone-400 mb-2 uppercase tracking-wide">航班</h3>
                         
@@ -244,13 +317,13 @@
                 <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6"><h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-4 uppercase border-b border-stone-100 dark:border-stone-700 pb-2">資料備份 (本機)</h3><div class="flex gap-2"><button onclick="exportLocalData()" class="flex-1 bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 rounded-lg text-xs py-2 hover:bg-stone-200"><i class="fa-solid fa-download mr-1"></i>匯出備份</button><label class="flex-1 bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 rounded-lg text-xs py-2 hover:bg-stone-200 text-center cursor-pointer"><i class="fa-solid fa-upload mr-1"></i>匯入還原<input type="file" id="import-file" accept=".json" class="hidden" onchange="importLocalData(this)"></label></div></div>
                 <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6"><h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-4 uppercase border-b border-stone-100 dark:border-stone-700 pb-2">旅程設定</h3><div class="space-y-3"><div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">標題 (同步)</label><input type="text" id="setting-title" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2"></div><div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">日期 (同步)</label><input type="text" id="setting-date" class="w-full bg-muji-base dark:bg-stone-900 dark:text-white border-none rounded-lg text-sm px-3 py-2"></div><button onclick="saveShared()" class="w-full bg-stone-700 dark:bg-stone-600 text-white rounded-lg text-sm font-bold py-2 mt-2">儲存設定</button></div></div>
                 <div class="grid grid-cols-2 gap-4 mb-6"><a href="https://www.jma.go.jp/jma/index.html" target="_blank" class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl text-center border border-blue-100 dark:border-blue-900/30 block"><i class="fa-solid fa-cloud-sun-rain text-2xl text-blue-400 mb-2"></i><div class="text-sm font-bold text-stone-600 dark:text-stone-200">天氣</div></a><a href="https://www.google.com/maps/search/Police+Station" target="_blank" class="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl text-center border border-red-100 dark:border-red-900/30 block"><i class="fa-solid fa-shield-halved text-2xl text-red-400 mb-2"></i><div class="text-sm font-bold text-stone-600 dark:text-stone-200">警察</div></a></div>
-                <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6"><h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3 uppercase border-b border-stone-100 dark:border-stone-700 pb-2">緊急聯絡</h3><div class="space-y-3"><div class="flex justify-between text-sm"><span class="text-muji-text dark:text-stone-200">救護車 / 火警</span><span class="font-bold text-red-500 font-mono">119</span></div><div class="flex justify-between text-sm"><span class="text-muji-text dark:text-stone-200">大阪辦事處</span><span class="font-bold text-muji-text dark:text-stone-200 font-mono">+81-90-8794-4568</span></div></div></div>
+                <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6"><h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3 uppercase border-b border-stone-100 dark:border-stone-700 pb-2">緊急聯絡</h3><div class="space-y-3"><div class="flex justify-between text-sm"><span class="text-muji-text dark:text-stone-200">救護車 / 火警</span><span class="font-bold text-red-500 font-mono">119</span></div><div class="flex justify-between text-sm"><span class="text-muji-text dark:text-stone-200">東京辦事處</span><span class="font-bold text-muji-text dark:text-stone-200 font-mono">080-1009-7179</span></div></div></div>
                 <div class="text-center mt-8 mb-4"><button onclick="clearAllData()" class="text-xs text-red-300 border border-red-100 dark:border-red-900/50 px-3 py-1 rounded">重置本機與雲端資料</button></div>
             </div>
         </main>
 
         <!-- Navigation & Modals -->
-        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 px-2 py-2 flex justify-around items-end z-50 text-[10px] font-medium text-stone-400 pb-safe transition-colors duration-300">
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/20 dark:bg-black/30 border-t border-white/20 dark:border-white/10 px-2 py-2 flex justify-around items-end z-50 text-[10px] font-medium text-stone-400 pb-safe transition-colors duration-300 backdrop-blur-md">
             <button onclick="switchTab('plan')" class="nav-btn active flex flex-col items-center gap-1 p-2 w-1/5 text-muji-primary dark:text-stone-500" data-target="plan"><i class="fa-regular fa-calendar-days text-lg mb-0.5"></i><span>行程</span></button>
             <button onclick="switchTab('guide')" class="nav-btn flex flex-col items-center gap-1 p-2 w-1/5 hover:text-stone-600" data-target="guide"><i class="fa-solid fa-book-open text-lg mb-0.5"></i><span>導覽</span></button>
             <button onclick="switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1 p-2 w-1/5 -mt-6" data-target="wallet"><div class="bg-stone-700 dark:bg-stone-200 text-white dark:text-stone-900 rounded-full w-12 h-12 flex items-center justify-center shadow-lg"><i class="fa-solid fa-wallet text-xl"></i></div><span class="mt-1">錢包</span></button>
@@ -297,7 +370,7 @@
 
         // ↓↓↓ 請將您的 Firebase 設定貼在下方 ↓↓↓
         const myFirebaseConfig = {
-            apiKey: "AIzaSyByoGa9zSiiOMMSUehtJxY6NfbAZ-p2id0",
+              apiKey: "AIzaSyByoGa9zSiiOMMSUehtJxY6NfbAZ-p2id0",
             authDomain: "japantrip2026-8485f.firebaseapp.com",
             projectId: "japantrip2026-8485f",
             storageBucket: "japantrip2026-8485f.firebasestorage.app",
@@ -560,7 +633,7 @@
                 `;
             });
 
-            const iconMap = { spot: 'fa-map-pin', food: 'fa-utensils', shopping: 'fa-bag-shopping', ticket: 'fa-ticket', hotel: 'fa-bed', transport: 'fa-train-subway' };
+            const iconMap = { spot: 'fa-map-pin', food: 'fa-utensils', transport: 'fa-train-subway', shopping: 'fa-bag-shopping', ticket: 'fa-ticket', hotel: 'fa-bed', transport: 'fa-train-subway' };
             
             autoSpots.forEach(spotName => {
                 if (manualGuides.some(g => g.title === spotName)) return;
