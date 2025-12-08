@@ -323,7 +323,7 @@
         </main>
 
         <!-- Navigation & Modals -->
-        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/20 dark:bg-black/30 border-t border-white/20 dark:border-white/10 px-2 py-2 flex justify-around items-end z-50 text-[10px] font-medium text-stone-400 pb-safe transition-colors duration-300 backdrop-blur-md">
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/80 dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 px-2 py-2 flex justify-around items-end z-50 text-[10px] font-medium text-stone-400 pb-safe transition-colors duration-300 backdrop-blur-md">
             <button onclick="switchTab('plan')" class="nav-btn active flex flex-col items-center gap-1 p-2 w-1/5 text-muji-primary dark:text-stone-500" data-target="plan"><i class="fa-regular fa-calendar-days text-lg mb-0.5"></i><span>行程</span></button>
             <button onclick="switchTab('guide')" class="nav-btn flex flex-col items-center gap-1 p-2 w-1/5 hover:text-stone-600" data-target="guide"><i class="fa-solid fa-book-open text-lg mb-0.5"></i><span>導覽</span></button>
             <button onclick="switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1 p-2 w-1/5 -mt-6" data-target="wallet"><div class="bg-stone-700 dark:bg-stone-200 text-white dark:text-stone-900 rounded-full w-12 h-12 flex items-center justify-center shadow-lg"><i class="fa-solid fa-wallet text-xl"></i></div><span class="mt-1">錢包</span></button>
@@ -344,6 +344,19 @@
             <input type="text" id="edit-in-num" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm">
         </div><div class="flex justify-end gap-3"><button onclick="closeModal('edit-flight-modal')" class="text-sm text-gray-500">取消</button><button onclick="saveFlightInfo()" class="text-sm bg-stone-700 text-white px-4 py-2 rounded">儲存</button></div></div></div>
         
+        <!-- NEW: Move Day Modal -->
+        <div id="move-day-modal" class="modal-overlay">
+            <div class="modal-box">
+                <h3 class="font-bold text-lg mb-4 dark:text-white">移動天數</h3>
+                <p class="text-sm text-gray-500 mb-4 dark:text-gray-400">將目前行程移動至...</p>
+                <select id="move-day-select" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm mb-6"></select>
+                <div class="flex justify-end gap-3">
+                    <button onclick="closeModal('move-day-modal')" class="text-sm text-gray-500">取消</button>
+                    <button id="save-move-day-btn" class="text-sm bg-stone-700 text-white px-4 py-2 rounded">確定</button>
+                </div>
+            </div>
+        </div>
+
         <!-- PLAN EDIT MODAL -->
         <div id="edit-plan-modal" class="modal-overlay"><div class="modal-box"><h3 class="font-bold text-lg mb-4 dark:text-white">編輯行程</h3><div class="space-y-3 mb-6"><div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">日期 (可移動)</label><select id="edit-plan-day" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></select></div><div class="flex gap-2"><div class="w-1/3"><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">時間</label><input type="time" id="edit-plan-time" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div><div class="w-2/3"><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">類型</label><select id="edit-plan-type" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"><option value="spot">景點</option><option value="food">美食</option><option value="transport">交通</option><option value="shopping">購物</option><option value="hotel">住宿</option></select></div></div><div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">內容</label><input type="text" id="edit-plan-text" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div><div><label class="block text-xs text-stone-500 dark:text-stone-400 mb-1">連結</label><input type="text" id="edit-plan-link" class="w-full bg-stone-100 dark:bg-stone-900 dark:text-white p-2 rounded text-sm"></div><div class="flex items-center gap-2"><input type="checkbox" id="edit-plan-important" class="muji-checkbox w-4 h-4"><label for="edit-plan-important" class="text-xs text-stone-600 dark:text-stone-300">重要</label></div></div><div class="flex justify-end gap-3"><button onclick="closeModal('edit-plan-modal')" class="text-sm text-gray-500">取消</button><button onclick="saveEditedPlanEvent()" class="text-sm bg-stone-700 text-white px-4 py-2 rounded">儲存</button></div></div></div>
 
@@ -370,7 +383,7 @@
 
         // ↓↓↓ 請將您的 Firebase 設定貼在下方 ↓↓↓
         const myFirebaseConfig = {
-              apiKey: "AIzaSyByoGa9zSiiOMMSUehtJxY6NfbAZ-p2id0",
+            apiKey: "AIzaSyByoGa9zSiiOMMSUehtJxY6NfbAZ-p2id0",
             authDomain: "japantrip2026-8485f.firebaseapp.com",
             projectId: "japantrip2026-8485f",
             storageBucket: "japantrip2026-8485f.firebasestorage.app",
@@ -528,6 +541,57 @@
             }
         };
 
+        // NEW: Open Move Day Modal
+        window.openMoveDayModal = (currentIndex) => {
+            const select = document.getElementById('move-day-select');
+            select.innerHTML = '';
+            sharedData.tripData.forEach((d, i) => {
+                const option = document.createElement('option');
+                option.value = i;
+                option.text = `移動到：第 ${i + 1} 天 (${d.date})`;
+                if(i === currentIndex) {
+                    option.text += " (目前)";
+                    option.disabled = true; // Cannot move to self
+                }
+                select.appendChild(option);
+            });
+            
+            // Set save handler
+            document.getElementById('save-move-day-btn').onclick = () => {
+                const targetIndex = parseInt(select.value);
+                if (!isNaN(targetIndex)) {
+                    window.moveDay(currentIndex, targetIndex);
+                }
+                closeModal('move-day-modal');
+            };
+            
+            document.getElementById('move-day-modal').classList.add('active');
+        };
+
+        // NEW: Move Day Logic
+        window.moveDay = (fromIndex, toIndex) => {
+            if(fromIndex === toIndex) return;
+            
+            // Move item in array
+            const item = sharedData.tripData.splice(fromIndex, 1)[0];
+            sharedData.tripData.splice(toIndex, 0, item);
+            
+            // Renumber days to keep sequence correct (Day 1, Day 2...)
+            // Note: We keep the original 'date' (e.g. 1/11) attached to the moved content,
+            // or we could swap dates if we wanted strict date sequence.
+            // Here we assume "Day X" label should be sequential.
+            sharedData.tripData.forEach((d, i) => {
+                d.day = `第${i+1}天`;
+            });
+            
+            // Switch view to the new position of the moved day
+            currentPlanDayIndex = toIndex;
+            
+            saveShared();
+            renderPlan();
+            showToast("天數已移動");
+        };
+
         // --- RENDER LOGIC ---
         function renderPlan() {
             const daySelector = document.getElementById('day-selector');
@@ -562,6 +626,8 @@
                             <p class="text-sm text-stone-500 dark:text-stone-400">${day.title}</p>
                         </div>
                         <div class="flex gap-2">
+                             <!-- NEW: Move Button -->
+                             <button onclick="openMoveDayModal(${currentPlanDayIndex})" class="text-stone-300 hover:text-stone-500 dark:hover:text-stone-200" title="移動此天"><i class="fa-solid fa-arrow-right-arrow-left"></i></button>
                              <button onclick="editDayHeader(${currentPlanDayIndex})" class="text-stone-300 hover:text-stone-500 dark:hover:text-stone-200"><i class="fa-solid fa-pen"></i></button>
                              <button onclick="exportDayImage()" class="text-stone-300 hover:text-stone-500 dark:hover:text-stone-200"><i class="fa-solid fa-image"></i></button>
                              <button onclick="deleteDay(${currentPlanDayIndex})" class="text-stone-300 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
