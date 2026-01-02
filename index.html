@@ -245,53 +245,121 @@
                 <div class="text-center mt-6 mb-8"></div>
             </div>
 
-            <!-- 2. TRANSPORT (New) -->
+            <!-- 2. WORSHIP GUIDE (Renamed from Transport) -->
             <div id="tab-transport" class="tab-content">
                 <div class="mb-6">
-                    <h2 class="font-serif text-2xl text-muji-text dark:text-stone-100 mb-2">交通資訊</h2>
-                    <p class="text-sm text-muji-accent dark:text-stone-400">東京交通與路線查詢工具。</p>
+                    <h2 class="font-serif text-2xl text-muji-text dark:text-stone-100 mb-2">參拜指南</h2>
+                    <p class="text-sm text-muji-accent dark:text-stone-400">日本神社參拜禮儀與賽錢豆知識。</p>
                 </div>
 
-                <!-- Route Search Tools -->
+                <!-- NEW: Etiquette Steps -->
                 <div class="bg-white dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6">
-                    <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3">路線查詢 (乘換案內)</h3>
-                    <div class="grid grid-cols-2 gap-3">
-                        <a href="https://www.google.com/maps" target="_blank" class="flex flex-col items-center justify-center p-3 bg-stone-50 dark:bg-stone-700 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-600 transition">
-                            <i class="fa-brands fa-google text-2xl mb-1 text-blue-500"></i>
-                            <span class="text-xs text-stone-600 dark:text-stone-300">Google Maps</span>
-                        </a>
-                        <a href="https://world.jorudan.co.jp/mln/zh-tw/" target="_blank" class="flex flex-col items-center justify-center p-3 bg-stone-50 dark:bg-stone-700 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-600 transition">
-                            <i class="fa-solid fa-train-subway text-2xl mb-1 text-green-600"></i>
-                            <span class="text-xs text-stone-600 dark:text-stone-300">Jorudan</span>
-                        </a>
-                        <a href="https://transit.yahoo.co.jp/" target="_blank" class="flex flex-col items-center justify-center p-3 bg-stone-50 dark:bg-stone-700 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-600 transition">
-                            <span class="text-xl font-bold text-red-500 mb-1">Y!</span>
-                            <span class="text-xs text-stone-600 dark:text-stone-300">Yahoo! 路線</span>
-                        </a>
-                         <a href="https://www.tokyometro.jp/tcn/subwaymap/" target="_blank" class="flex flex-col items-center justify-center p-3 bg-stone-50 dark:bg-stone-700 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-600 transition">
-                            <i class="fa-solid fa-map text-2xl mb-1 text-purple-500"></i>
-                            <span class="text-xs text-stone-600 dark:text-stone-300">地鐵路線圖</span>
-                        </a>
+                    <h3 class="font-bold text-muji-primary dark:text-stone-400 mb-4 flex items-center gap-2 uppercase tracking-wide">
+                        <i class="fa-solid fa-person-praying"></i> 參拜基本禮儀
+                    </h3>
+                    
+                    <!-- 1. Entering -->
+                    <div class="mb-6 relative border-l-2 border-stone-200 dark:border-stone-700 pl-4">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-stone-200 dark:bg-stone-600 border-2 border-white dark:border-stone-800"></div>
+                        <h4 class="font-bold text-stone-700 dark:text-stone-200 text-sm mb-1">1. 通過鳥居</h4>
+                        <p class="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">
+                            進入前先輕輕一鞠躬。請走在參道兩側，不要走正中間（那是神明走的通道）。
+                        </p>
+                    </div>
+
+                    <!-- 2. Temizuya -->
+                    <div class="mb-6 relative border-l-2 border-stone-200 dark:border-stone-700 pl-4">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-stone-200 dark:bg-stone-600 border-2 border-white dark:border-stone-800"></div>
+                        <h4 class="font-bold text-stone-700 dark:text-stone-200 text-sm mb-2">2. 手水舍（洗手）</h4>
+                        <div class="bg-stone-50 dark:bg-stone-900/50 p-3 rounded-lg text-xs text-stone-600 dark:text-stone-300 space-y-1.5">
+                            <div class="flex gap-2"><span class="font-bold text-stone-400">①</span> <span>右手拿勺洗左手。</span></div>
+                            <div class="flex gap-2"><span class="font-bold text-stone-400">②</span> <span>換左手拿勺洗右手。</span></div>
+                            <div class="flex gap-2"><span class="font-bold text-stone-400">③</span> <span>右手拿勺，倒水在左手掌心漱口（勿直接就口）。</span></div>
+                            <div class="flex gap-2"><span class="font-bold text-stone-400">④</span> <span>再次洗左手。</span></div>
+                            <div class="flex gap-2"><span class="font-bold text-stone-400">⑤</span> <span>立起勺子，用剩餘的水清洗柄部，放回原處。</span></div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Worship -->
+                    <div class="relative border-l-2 border-stone-200 dark:border-stone-700 pl-4">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-stone-200 dark:bg-stone-600 border-2 border-white dark:border-stone-800"></div>
+                        <h4 class="font-bold text-stone-700 dark:text-stone-200 text-sm mb-2">3. 本殿參拜（二禮二拍手一禮）</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-coins"></i></div>
+                                <div class="text-xs text-stone-600 dark:text-stone-300"><span class="font-bold">賽錢：</span>輕輕投入賽錢箱（那是給神的供品，不是許願費）。</div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-bell"></i></div>
+                                <div class="text-xs text-stone-600 dark:text-stone-300"><span class="font-bold">搖鈴：</span>若有鈴鐺，大力搖響以呼喚神明。</div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-700 text-stone-600 flex items-center justify-center flex-shrink-0 font-serif font-bold">2</div>
+                                <div class="text-xs text-stone-600 dark:text-stone-300"><span class="font-bold">二禮：</span>深深鞠躬兩次。</div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-700 text-stone-600 flex items-center justify-center flex-shrink-0 font-serif font-bold">2</div>
+                                <div class="text-xs text-stone-600 dark:text-stone-300"><span class="font-bold">二拍手：</span>雙手合十，右手稍微向下一點，拍手兩次。在此時許願。</div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-700 text-stone-600 flex items-center justify-center flex-shrink-0 font-serif font-bold">1</div>
+                                <div class="text-xs text-stone-600 dark:text-stone-300"><span class="font-bold">一禮：</span>最後深深鞠躬一次。</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- IC Card Tips -->
+                <div class="bg-white dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6">
+                    <p class="text-sm text-stone-600 dark:text-stone-300 leading-relaxed mb-4">
+                        大家到日本參拜的時候投的錢錢要記得不是隨意唷🥹<br>
+                        不同的數字其實是有不同含義的（多為取日文的諧音而來）。
+                    </p>
+
+                    <!-- Bad List -->
+                    <h3 class="font-bold text-red-500 mb-2 flex items-center gap-2"><i class="fa-solid fa-circle-xmark"></i> 不吉利的金額</h3>
+                    <ul class="text-sm text-stone-600 dark:text-stone-400 space-y-1 mb-6 pl-2 border-l-2 border-red-200 dark:border-red-900/50">
+                        <li><span class="font-mono font-bold w-12 inline-block text-stone-400">10円</span> 遠縁 (變得疏遠)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-stone-400">33円</span> 散散 (會遇到不好的事情)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-stone-400">65円</span> ろくなご縁がない (沒有好緣分)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-stone-400">69円</span> ろくなことがない (什麼好事都沒有)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-stone-400">71円</span> ない (沒有緣分)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-stone-400">75円</span> なんのご縁もない (完全沒有緣分)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-stone-400">79円</span> 泣く (會哭)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-stone-400">85円</span> やっぱりご縁がない (果然還是沒有緣分)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-stone-400">95円</span> これまたご縁がない (會遇到辛苦的緣分)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-stone-400">105円</span> 當分ご縁がない (暫時沒有緣分)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-stone-400">500円</span> これ以上効果がない (沒有更多效果)</li>
+                    </ul>
+
+                    <!-- Good List -->
+                    <h3 class="font-bold text-green-600 dark:text-green-400 mb-2 flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> 吉祥的金額</h3>
+                    <ul class="text-sm text-stone-600 dark:text-stone-400 space-y-1 pl-2 border-l-2 border-green-200 dark:border-green-900/50">
+                        <li><span class="font-mono font-bold w-12 inline-block text-amber-500">5円</span> ご縁 (有緣)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-amber-500">11円</span> いい縁 (好緣分)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-amber-500">15円</span> 十分ご縁 (非常好的緣分)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-amber-500">20円</span> 二重にご縁 (雙重緣分)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-amber-500">25円</span> 二重にご縁 (雙倍的好緣)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-amber-500">35円</span> 再三ご縁 (再次結緣)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-amber-500">41円</span> 始終いい縁 (有始有終的好緣)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-amber-500">45円</span> 始終ご縁 (從頭到尾都是好緣)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-amber-500">50円</span> 五重のご縁 (五重好緣)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-amber-500">55円</span> 五重にご縁 (重重好緣)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-amber-500">100円</span> 百の縁 (百倍的緣分)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-amber-500">105円</span> 十分にご縁 (十分好的緣分)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-amber-500">115円</span> いいご縁 (很好的緣分)</li>
+                        <li><span class="font-mono font-bold w-12 inline-block text-amber-500">125円</span> 十二分にご縁 (十二分的好緣)</li>
+                    </ul>
+                </div>
+
+                <!-- Footer Note -->
                 <div class="bg-muji-card dark:bg-stone-800 p-5 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700 mb-6">
-                    <h3 class="text-sm font-bold text-muji-primary dark:text-stone-400 mb-3">交通卡 (IC Card)</h3>
-                    <div class="space-y-3">
-                         <div class="flex items-start gap-3">
-                            <div class="bg-green-100 text-green-600 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-mobile-screen"></i></div>
-                            <div>
-                                <h4 class="text-sm font-bold dark:text-stone-200">iPhone / Apple Watch</h4>
-                                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">直接在「錢包」App 按 + 號，選擇 Suica 或 PASMO 即可開卡，可使用 Apple Pay 儲值。</p>
-                            </div>
-                        </div>
-                         <div class="flex items-start gap-3">
-                            <div class="bg-stone-100 text-stone-600 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"><i class="fa-regular fa-credit-card"></i></div>
-                            <div>
-                                <h4 class="text-sm font-bold dark:text-stone-200">實體卡片</h4>
-                                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">目前實體 Suica/PASMO 較難買到，建議使用 Welcome Suica (紅色) 或 PASMO PASSPORT (Hello Kitty)，或直接使用手機版。</p>
-                            </div>
+                    <div class="flex gap-4">
+                        <img src="https://images.unsplash.com/photo-1543789062-84323b3f4692?q=80&w=300&auto=format&fit=crop" class="w-24 h-24 object-cover rounded-lg flex-shrink-0 bg-stone-200">
+                        <div>
+                            <h3 class="font-bold text-sm mb-1 dark:text-stone-200">五所明神社 ⛩️</h3>
+                            <p class="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">
+                                位於大分縣佐伯市，在軌道邊的山坡地上，有著古老傳說的歷史，默默地守護著市民。歡迎來走走唷😘
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -390,8 +458,8 @@
         <!-- Navigation & Modals -->
         <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/80 dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 px-2 py-2 flex justify-around items-end z-50 text-[10px] font-medium text-stone-400 pb-safe transition-colors duration-300 backdrop-blur-md">
             <button onclick="switchTab('plan')" class="nav-btn active flex flex-col items-center gap-1 p-2 w-1/5 text-muji-primary dark:text-stone-500" data-target="plan"><i class="fa-regular fa-calendar-days text-lg mb-0.5"></i><span>行程</span></button>
-            <!-- REPLACED: Guide with Transport -->
-            <button onclick="switchTab('transport')" class="nav-btn flex flex-col items-center gap-1 p-2 w-1/5 hover:text-stone-600" data-target="transport"><i class="fa-solid fa-train-subway text-lg mb-0.5"></i><span>交通</span></button>
+            <!-- REPLACED: Transport with Guide -->
+            <button onclick="switchTab('transport')" class="nav-btn flex flex-col items-center gap-1 p-2 w-1/5 hover:text-stone-600" data-target="transport"><i class="fa-solid fa-hands-praying text-lg mb-0.5"></i><span>參拜</span></button>
             <button onclick="switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1 p-2 w-1/5 -mt-6" data-target="wallet"><div class="bg-stone-700 dark:bg-stone-200 text-white dark:text-stone-900 rounded-full w-12 h-12 flex items-center justify-center shadow-lg"><i class="fa-solid fa-wallet text-xl"></i></div><span class="mt-1">錢包</span></button>
             <button onclick="switchTab('lists')" class="nav-btn flex flex-col items-center gap-1 p-2 w-1/5 hover:text-stone-600" data-target="lists"><i class="fa-solid fa-list-check text-lg mb-0.5"></i><span>清單</span></button>
             <button onclick="switchTab('info')" class="nav-btn flex flex-col items-center gap-1 p-2 w-1/5 hover:text-stone-600" data-target="info"><i class="fa-solid fa-circle-info text-lg mb-0.5"></i><span>資訊</span></button>
